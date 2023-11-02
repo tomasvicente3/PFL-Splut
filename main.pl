@@ -9,20 +9,31 @@ initial_state(Size, [Board,Turns]):-
     init_board(Size, Board), !.
 
 /*
-%display_game(Game)
-display_game(Board):-. % TODO
+%step(+GameState, +Player, +CurrentStep, +MaxStep, -NewGameState)
+step(FinalGameState,_, Step, Step, FinalGameState).
+step(GameState, Player, CurrentStep, MaxStep, FinalGameState):-
+    CurrentStep < MaxStep,
+    choose_move(GameState, Player, Move),
+    move(GameState, Move, NewGameState), !,
+    NewStep is CurrentStep + 1,
+    step(NewGameState, Player, NewStep, MaxStep, FinalGameState).
+
 
 %game_cycle(+GameState, +Player)
-game_cycle([Board,Turns], Player):-
+game_cycle([Board,_], Player):-
     game_over(Board, Winner), !,
     congratulate(Winner).
 
-game_cycle([Board, Turns], Player):-
-    choose_move(Board, Player, Move),
-    move(Board, Move, NewBoard),
+game_cycle(GameState, Player):-
+    [Board, Turns] = GameState,
+    min(Turns, 3, MaxSteps),
+    step(GameState, Player, 0, MaxSteps, NewGameState),
+    
     NextPlayer is mod(Player,2)+1,
-    display_game([NewBoard, Turns]), !,
-    game_cycle([Board, Turns], NextPlayer).
+    NextTurns is Turns + 1,
+    [NewBoard, NextTurns] = NewerGameState,
+    display_game(NewGameState), !,
+    game_cycle(NewerGameState, NextPlayer).
 
 
 %game_over(+GameState, -Winner)
