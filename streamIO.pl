@@ -8,13 +8,13 @@ print_logo :-
 
 
 board([
-    [-1, -1, -1, 'R', -1, -1, -1],
+    [-1, -1, -1,  'R', -1,  -1, -1],
     [-1, -1, 't', 'd', 's', -1, -1],
-    [-1, 0, 0, 0, 0, 0, -1],
-    ['R', 0, 0, 0, 0, 0, 'R'],
-    [-1, 0, 0, 0, 0, 0, -1],
+    [-1,  0,  0,   0,   0,   0, -1],
+    ['R', 0,  0,   0,   0,   0, 'R'],
+    [-1,  0,  0,   0,   0,   0, -1],
     [-1, -1, 'S', 'D', 'T', -1, -1],
-    [-1, -1, -1, 'R', -1, -1, -1]
+    [-1, -1, -1,  'R', -1,  -1, -1]
 ]).
 
 display_game:-
@@ -43,6 +43,5 @@ display_board_row([Cell | Rest]) :-
 	display_cell(Cell),
 	display_board_row(Rest).
 
-display_cell(-1) :- write(' ').
 display_cell(0) :- write(' ').
 display_cell(Cell) :- write(Cell).
