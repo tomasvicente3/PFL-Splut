@@ -1,48 +1,54 @@
+:- consult('utils.pl').
+:- consult('board.pl').
+:- consult('streamIO.pl').
+
 %initial_state(+Size, -GameState)
-initial_state(Size, GameState):-. % TODO
+initial_state(Size, [Board,Player,Turns]):-
+    Player = 1,
+    Turns = 1,
+    init_board(Size, Board), !.
 
-%display_game(+GameState)
-display_game(GameState-Player):-. % TODO
+/*
+%display_game(Board)
+display_game(Board):-. % TODO
 
+%game_cycle(+GameState)
+game_cycle([Board,Player,Turns]):-
+    game_over([Board, Player], Winner), !,
+    congratulate(Player).
 
-play:-
-    initial_state(GameState-Player),
-    display_game(GameState-Player),
-    game_cycle(GameState-Player).
-
-
-game_cycle(GameState-Player):-
-    game_over(GameState, Winner), !,
-    congratulate(Winner).
-
-game_cycle(GameState-Player):-
-    choose_move(GameState, Player, Move),
-    move(GameState, Move, NewGameState),
-    next_player(Player, NextPlayer),
-    display_game(NewGameState-NextPlayer), !,
-    game_cycle(NewGameState-NextPlayer).
+game_cycle([Board, Player, Turns]):-
+    choose_move(Board, Player, Move),
+    move(Board, Move, NewBoard),
+    NextPlayer is mod(Player,2)+1,
+    display_game([NewBoard, NewPlayer, Turns]), !,
+    game_cycle([Board, Player, Turns]).
 
 
 %game_over(+GameState, -Winner)
-game_over(GameState, Winner):-. % TODO
-
-
-choose_move(GameState, human, Move):-
-% interaction to select move TODO
-
-choose_move(GameState, computer-Level, Move):-
-    valid_moves(GameState, Moves),
-    choose_move(Level, GameState, Moves, Move).
+game_over([Board, Player], Winner):-. % TODO
 
 %valid_moves(+GameState, +Player, -ListOfMoves)
 valid_moves(GameState, Player, ListOfMoves):-
     findall(Move, move(GameState, Move, NewState), Moves).
 
-/** trocar o choose move aqui? Está nos slides mas não no enunciado aqui está choose_move(Level, GameState, Moves, Move)**/
-choose_move(1, _GameState, Moves, Move):-
+%choose_move(+Board, +Player, -Move)
+%jogador escolhe jogada
+choose_move(GameState, human, Move):-
+% interaction to select move TODO
+
+
+%choose_move(+Board, +Player, +ComputerLevel, -Move)
+%computador escolhe jogada
+choose_move(Board, Player, ComputerLevel, Move):-
+    valid_moves(GameState, Moves),
+    choose_move(Level, GameState, Moves, Move).
+
+/** trocar o choose move aqui? Está nos slides mas não no enunciado aqui está choose_move(Level, GameState, Moves, Move)**//*
+choose_move(Board, Player, 1, Move):-
     random_select(Move, Moves, _Rest).
 
-choose_move(2, GameState, Moves, Move):-
+choose_move(Board, Player, 2, Move):-
     setof(Value-Mv, NewState^( member(Mv, Moves),
     move(GameState, Mv, NewState),
     value(NewState, Player, Value) ), [_V-Move|_]).
@@ -53,7 +59,26 @@ move(GameState, Move, NewGameState):-. %TODO
 
 %value(+GameState, +Player, -Value)
 value(GameState, Player, Value):-.
+*/
+
+menu(1):-
+    get_board_size(Size),
+    initial_state(Size, [Board, Player, Turns]),
+    display_game(Board),
+    %format("Player: ~w, Turn: ~w", [Player, Turns]).
+    %game_cycle([Board, Player, Turns]).
+
+menu(2):-
+    %rules, !,
+    play.
+
+menu(3).
 
 
-%choose_move(+GameState, +Player, +Level, -Move)
-choose_move(GameState, Player, Level, Move):-.
+play:-
+    repeat,
+    write('\33\[2J'),
+    print_logo,
+    read_number(Option),
+    between(1,3,Option), !,
+    menu(Option).
