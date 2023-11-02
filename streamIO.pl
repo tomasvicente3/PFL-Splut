@@ -22,17 +22,27 @@ display_game:-
     display_board(GameBoard).
 
 display_board(Board) :-
-    display_board_rows(Board).
+	write('  | A | B | C | D | E | F | G |'), nl,
+	write('   ----------------------------'), nl,
+	display_board_rows(Board, 1).
 
-display_board_rows([]).
-display_board_rows([Row | Rest]) :-
-    display_board_row(Row),
-    nl,
-    display_board_rows(Rest).
+display_board_rows([], _).
+display_board_rows([Row | Rest], N) :-
+	write(N),
+	write(' |'),
+	display_board_row(Row),
+	nl,
+	write('   ----------------------------'), nl,
+	N1 is N + 1,
+	display_board_rows(Rest, N1).
 
-display_board_row([]).
+display_board_row([]) :- write('|').
+display_board_row([-1 | Rest]) :- write('    '), display_board_row(Rest).
 display_board_row([Cell | Rest]) :-
-    (Cell = -1 -> write('   ');
-     Cell = 0 -> write(' |_| ');
-     format(' |~w| ', [Cell])),
-    display_board_row(Rest).
+	write(' | '),
+	display_cell(Cell),
+	display_board_row(Rest).
+
+display_cell(-1) :- write(' ').
+display_cell(0) :- write(' ').
+display_cell(Cell) :- write(Cell).
