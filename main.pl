@@ -1,6 +1,6 @@
 :- consult('utils.pl').
 :- consult('board.pl').
-:- consult('visuals.pl').
+:- consult('streamIO.pl').
 
 %initial_state(+Size, -GameState)
 initial_state(Size, [Board,Player,Turns]):-
@@ -61,8 +61,24 @@ move(GameState, Move, NewGameState):-. %TODO
 value(GameState, Player, Value):-.
 */
 
-play:-
-    get_game_configurations(Size),
+menu(1):-
+    get_board_size(Size),
     initial_state(Size, [Board, Player, Turns]),
-    %display_game(Board),
+    display_game(Board),
+    %format("Player: ~w, Turn: ~w", [Player, Turns]).
     %game_cycle([Board, Player, Turns]).
+
+menu(2):-
+    %rules, !,
+    play.
+
+menu(3).
+
+
+play:-
+    repeat,
+    write('\33\[2J'),
+    print_logo,
+    read_number(Option),
+    between(1,3,Option), !,
+    menu(Option).
