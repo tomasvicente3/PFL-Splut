@@ -1,16 +1,15 @@
+:- consult('utils.pl').
+:- consult('board.pl').
+:- consult('visuals.pl').
+/*
 %initial_state(+Size, -GameState)
-initial_state(Size, GameState):-. % TODO
+initial_state(Size, GameState-Player):-
+    .%TODO
 
 %display_game(+GameState)
 display_game(GameState-Player):-. % TODO
 
-
-play:-
-    initial_state(GameState-Player),
-    display_game(GameState-Player),
-    game_cycle(GameState-Player).
-
-
+%game_cycle(+GameState)
 game_cycle(GameState-Player):-
     game_over(GameState, Winner), !,
     congratulate(Winner).
@@ -38,7 +37,7 @@ choose_move(GameState, computer-Level, Move):-
 valid_moves(GameState, Player, ListOfMoves):-
     findall(Move, move(GameState, Move, NewState), Moves).
 
-/** trocar o choose move aqui? Está nos slides mas não no enunciado aqui está choose_move(Level, GameState, Moves, Move)**/
+/** trocar o choose move aqui? Está nos slides mas não no enunciado aqui está choose_move(Level, GameState, Moves, Move)**//*
 choose_move(1, _GameState, Moves, Move):-
     random_select(Move, Moves, _Rest).
 
@@ -57,3 +56,10 @@ value(GameState, Player, Value):-.
 
 %choose_move(+GameState, +Player, +Level, -Move)
 choose_move(GameState, Player, Level, Move):-.
+*/
+
+play:-
+    get_game_configurations(Size),
+    initial_state(Size, GameState-Player),
+    display_game(GameState-Player),
+    game_cycle(GameState-Player).
