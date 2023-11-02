@@ -7,7 +7,7 @@ print_logo :-
     write('\t  |_____/|_|     |_______| (_____/       |_|\n').
 
 
-display_game(Board) :-
+display_game([Board,_]) :-
 	write('  | A | B | C | D | E | F | G |'), nl,
 	write('   ----------------------------'), nl,
 	display_board_rows(Board, 1).

@@ -1,35 +1,35 @@
 :- consult('utils.pl').
+:- consult('menu.pl').
 :- consult('board.pl').
 :- consult('streamIO.pl').
 
 %initial_state(+Size, -GameState)
-initial_state(Size, [Board,Player,Turns]):-
-    Player = 1,
+initial_state(Size, [Board,Turns]):-
     Turns = 1,
     init_board(Size, Board), !.
 
 /*
-%display_game(Board)
+%display_game(Game)
 display_game(Board):-. % TODO
 
-%game_cycle(+GameState)
-game_cycle([Board,Player,Turns]):-
-    game_over([Board, Player], Winner), !,
-    congratulate(Player).
+%game_cycle(+GameState, +Player)
+game_cycle([Board,Turns], Player):-
+    game_over(Board, Winner), !,
+    congratulate(Winner).
 
-game_cycle([Board, Player, Turns]):-
+game_cycle([Board, Turns], Player):-
     choose_move(Board, Player, Move),
     move(Board, Move, NewBoard),
     NextPlayer is mod(Player,2)+1,
-    display_game([NewBoard, NewPlayer, Turns]), !,
-    game_cycle([Board, Player, Turns]).
+    display_game([NewBoard, Turns]), !,
+    game_cycle([Board, Turns], NextPlayer).
 
 
 %game_over(+GameState, -Winner)
-game_over([Board, Player], Winner):-. % TODO
+game_over(Board, Winner):-. % TODO
 
 %valid_moves(+GameState, +Player, -ListOfMoves)
-valid_moves(GameState, Player, ListOfMoves):-
+valid_moves([Board,Turns], Player, ListOfMoves):-
     findall(Move, move(GameState, Move, NewState), Moves).
 
 %choose_move(+Board, +Player, -Move)
@@ -55,24 +55,11 @@ choose_move(Board, Player, 2, Move):-
 % value assumes lower value is better
 
 %move(+GameState, +Move, -NewGameState).
-move(GameState, Move, NewGameState):-. %TODO
+move([Board, Turns], Move, [NewBoard, NewTurns]):-. %TODO
 
 %value(+GameState, +Player, -Value)
-value(GameState, Player, Value):-.
+value([Board, Turns], Player, Value):-.
 */
-
-menu(1):-
-    get_board_size(Size),
-    initial_state(Size, [Board, Player, Turns]),
-    display_game(Board),
-    %format("Player: ~w, Turn: ~w", [Player, Turns]).
-    %game_cycle([Board, Player, Turns]).
-
-menu(2):-
-    %rules, !,
-    play.
-
-menu(3).
 
 
 play:-

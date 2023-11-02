@@ -1,5 +1,11 @@
 :- use_module(library(between)).
 
+%min(+A, +B, -Min)
+min(A, B, Min):-
+    A > B,
+    Min = B.
+min(A, _, A).
+
 % read_number(-Number)
 read_number(X):-
     read_number_aux(X,0).
