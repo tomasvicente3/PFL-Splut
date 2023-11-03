@@ -18,8 +18,10 @@ print_options :-
 firstMenu(1):-
     get_game_configurations(Size),
     initial_state(Size, GameState),
-    
+
     [Board, _, _] = GameState,
+    
+    clear_screen,
     display_game(Board), !,
 
     game_loop(GameState, 1).
@@ -34,7 +36,7 @@ firstMenu(2):-
     get_char(_),
     menu.
 
-firstMenu(3) :- true.
+firstMenu(3).
 
 get_game_configurations(Size):-
     get_board_size(Size),

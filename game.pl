@@ -21,8 +21,15 @@ can_move('Sorcerer', Board, [X, Y], Direction):-
     get_piece(Board, [Nx, Ny], Ocupied), !,
     Ocupied=0.
 
-choose_move(_, _, _):-
-    write('To be implemented'), nl.
+choose_move(Board, Player, Move):-
+    valid_moves([Board,_, _], Player, ListOfMoves),
+    write('Choose a move: \n'),
+
+    length(ListOfMoves, Length),
+    display_moves(ListOfMoves, Length, 1),
+
+    read_option(1, Length, Option),
+    nth1(Option, ListOfMoves, Move).
 
 move(Board, [Piece, [X,Y], Direction], NewBoard):-
     direction_map(Direction, [Dx, Dy]),
@@ -42,13 +49,12 @@ move(Board, [Piece, [X,Y], Direction], NewBoard):-
     set_piece(TempBoard, [Nx, Ny], Piece, TempBoard2),
     throw_rock(TempBoard2, [Nx, Ny], NewBoard), !.
 
-move(_, _, _):-
-    write('To be implemented'), nl.
-
 step([_, _, 0], _, _) :- !.
 
 step([Board, _, Steps], Player, NewBoard):-
+    format("Player ~w's turn (~w steps left)\n", [Player, Steps]), nl,
     choose_move(Board, Player, Move),
+    clear_screen,
     move(Board, Move, NewBoard),
     display_game(NewBoard),
     NewSteps is Steps - 1,
@@ -62,7 +68,8 @@ game_loop(GameState, Player) :-
     step([Board, _, Steps], Player, NewBoard),
     NewTurn is Turn + 1,
     min(NewTurn, 3, NewSteps),
-    game_loop([NewBoard, NewTurn, NewSteps], Player).
+    NewPlayer is 3 - Player,
+    game_loop([NewBoard, NewTurn, NewSteps], NewPlayer).
 
 %game_over(+GameState)
 game_over([Board, _, _]):-
