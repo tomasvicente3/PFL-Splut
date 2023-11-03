@@ -30,13 +30,13 @@ step(GameState, Player, CurrentStep, MaxStep, FinalGameState):-
     move(GameState, Move, NewGameState), !,
     NewStep is CurrentStep + 1,
     step(NewGameState, Player, NewStep, MaxStep, FinalGameState).
-
+*/
 
 %game_cycle(+GameState, +Player)
-game_cycle([Board,_], Player):-
+game_cycle([Board,_], _):-
     game_over(Board, Winner), !,
     congratulate(Winner).
-
+/*
 game_cycle(GameState, Player):-
     [Board, Turns] = GameState,
     min(Turns, 3, MaxSteps),
@@ -47,10 +47,6 @@ game_cycle(GameState, Player):-
     [NewBoard, NextTurns] = NewerGameState,
     display_game(NewGameState), !,
     game_cycle(NewerGameState, NextPlayer).
-
-
-%game_over(+GameState, -Winner)
-game_over(Board, Winner):-. % TODO
 
 %choose_move(+Board, +Player, -Move)
 %jogador escolhe jogada
@@ -80,3 +76,18 @@ move([Board, Turns], Move, [NewBoard, NewTurns]):-. %TODO
 %value(+GameState, +Player, -Value)
 value([Board, Turns], Player, Value):-.
 */
+
+
+%game_over(+GameState, -Winner)
+game_over([Board, _], Winner):-
+    \+ get_position(Board, 'S', _), !,
+    Winner = 2.
+game_over([Board, _], Winner):-
+    \+ get_position(Board, 's', _), !,
+    Winner = 1.
+
+congratulate(Winner):-
+    format(" You win!\nCongratulations, Player ~w!",[Winner]), nl,
+    write('Press any key to return to the main menu.\n'),
+    get_char(_),
+    menu.
