@@ -28,9 +28,9 @@ option(main_menu, 2):-
     clear_screen,
     print_logo,
     print_rules,
-    write('Press any key to return to the main menu.\n'),
-    get_char(_),
-    menu.
+    write('Press any key to return to the main menu. '),
+    get_char(_),!,
+    menu(main).
 
 option(main_menu, 3).
 
