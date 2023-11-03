@@ -46,6 +46,7 @@ step([_, _, 0], _, _) :- !.
 
 step([Board, _, Steps], Player, NewBoard):-
     choose_move(Board, Player, Move),
+    clear_screen,
     move(Board, Move, NewBoard),
     display_game(NewBoard),
     NewSteps is Steps - 1,

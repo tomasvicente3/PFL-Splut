@@ -67,17 +67,6 @@ get_moves(Board, [[Piece, [X,Y]] | Rest], ListOfMoves):-
     get_moves(Board, Rest, RestMoves),
     append(PieceMoves, RestMoves, ListOfMoves).
 
-/*
-[
-    [-1,-1,-1, 'R',-1, -1,-1],
-    [-1,-1,'t','d','s',-1,-1],
-    [-1, 0, 0,  0,  0,  0,-1],
-    ['R',0, 0, 'S','D', 0,'R'],
-    [-1, 0, 0,  0,  0,  0,-1],
-    [-1,-1,'0','T', 0, -1,-1],
-    [-1,-1,-1,' R',-1, -1,-1]]
-*/
-
 %get_position(+Board, +Piece, -Position)
 get_position(Board, Piece, [X, Y]):-
     get_position_aux(Board, Piece, [_, 1], [X, Y]).

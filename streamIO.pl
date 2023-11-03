@@ -35,7 +35,7 @@ display_moves(_, 0, _) :- nl.
 display_moves([H|T], N, I) :-
     [Piece, [X,Y], Direction] = H,
     piece_map(Piece, PieceName),
-    format('~w. ~w - ~w \n', [I, PieceName, Direction]),
+    format('~w. ~w(~w) - ~w \n', [I, PieceName, Piece, Direction]),
     N1 is N - 1,
     I1 is I + 1,
     display_moves(T, N1, I1).
