@@ -1,5 +1,3 @@
-:- use_module(library(lists)).
-
 %belongs(+Player, +Piece)
 belongs(1, 'S').
 belongs(1, 'D').
@@ -65,11 +63,11 @@ can_move('Sorcerer', Board, [X, Y], Direction):-
 %valid_moves(+GameState, +Player, -ListOfMoves)
 valid_moves([Board,_], Player, ListOfMoves):-
     findall(Piece, belongs(Player, Piece), PlayerPieces),
-    write(PlayerPieces), nl,
+    %write(PlayerPieces), nl,
     get_player_pieces_info(Board, PlayerPieces, PlayerPiecesInfo),
-    write(PlayerPiecesInfo), nl,
+    %write(PlayerPiecesInfo), nl,
     get_moves(Board, PlayerPiecesInfo, ListOfMoves),
-    write(ListOfMoves), nl.
+    %write(ListOfMoves), nl.
 
 %get_player_pieces_info(+Board, +PlayerPieces, -PlayerPiecesInfo)
 get_player_pieces_info(_, [], []).
@@ -83,7 +81,7 @@ get_player_pieces_info(Board, [Piece | Rest], RestInfo):-
 %get_moves(+Board, +PlayerPieces, -ListOfMoves)
 get_moves(_ ,[], []).
 get_moves(Board, [[Piece, [X,Y]] | Rest], ListOfMoves):-
-    format("Piece: ~w, Position: ~w", [Piece, [X,Y]]), nl,
+    %format("Piece: ~w, Position: ~w", [Piece, [X,Y]]), nl,
     Directions = ['N', 'E', 'S', 'W'],
     findall([Piece, [X,Y], Direction], (member(Direction, Directions), piece_map(Piece, PieceName), can_move(PieceName, Board, [X, Y], Direction)), PieceMoves),
     get_moves(Board, Rest, RestMoves),
@@ -116,7 +114,8 @@ get_piece(Board, [X, Y], Ocupied):-
     nth1(Y, Board, Row),
     nth1(X, Row, Ocupied), !.
     
-
+    
+%[[-1,-1,-1,'R',-1,-1,-1],[-1,-1,'t','d','s',-1,-1],[-1,0,0,0,0,0,-1],['R',0,0,0,0,0,'R'],[-1,0,0,0,0,0,-1],[-1,-1,'S','D','T',-1,-1],[-1,-1,-1,'R',-1,-1,-1]]
 %init_board(+Size, -Board)
 init_board(7, [
     [-1,   -1,   -1,   'R',    -1,   -1,   -1],
