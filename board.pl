@@ -39,6 +39,66 @@ column_map('I', 9).
 column_map('J', 10).
 column_map('K', 11).
 
+%in_bounds(+Board, +Position)
+in_bounds(Board, [X,Y]):-
+    X > 0, Y > 0,
+    length(Board, Size),
+    X =< Size, Y =< Size.
+
+%can_be_thrown_through(+Piece)
+can_be_thrown_through(0).
+can_be_thrown_through('D').
+can_be_thrown_through('d').
+
+%stops_rock(+Piece)
+stops_rock(-1).
+stops_rock('R').
+stops_rock('T').
+stops_rock('t').
+
+%can_throw(+Board, +Position, +Direction)
+can_throw(Board, [X, Y], Direction):-
+    direction_map(Direction, [Dx, Dy]),
+    Nx is X + Dx, Ny is Y + Dy,
+    get_piece(Board, [Nx, Ny], Ocupied),
+    can_be_thrown_through(Ocupied), !.
+
+%throw_rock(+Board, +Position, -NewBoard)
+throw_rock(Board, [X,Y], NewBoard):-
+    Directions = ['N', 'E', 'S', 'W'],
+    findall(Direction, (member(Direction, Directions), can_throw(Board, [X,Y], Direction)), ListOfDirections),!,
+    get_direction(ListOfDirections, ChosenDirection),
+    direction_map(ChosenDirection, [Dx, Dy]),
+    Nx is X + Dx, Ny is Y + Dy,
+    flying_rock(Board, [Nx,Ny], ChosenDirection, NewBoard).
+
+%flying_rock(+Board, +Position, +Direction, -NewBoard)
+flying_rock(Board, [X,Y], Direction, NewBoard):-
+    direction_map(Direction, [Dx, Dy]),
+    Nx is X + Dx, Ny is Y + Dy,
+    \+ in_bounds(Board, [Nx,Ny]), !,
+    set_piece(Board, [X,Y], 'R', NewBoard).
+
+flying_rock(Board, [X,Y], Direction, NewBoard):-
+    direction_map(Direction, [Dx, Dy]),
+    Nx is X + Dx, Ny is Y + Dy,
+    get_piece(Board, [Nx, Ny], NextPiece),
+    stops_rock(NextPiece), !,
+    set_piece(Board, [X,Y], 'R', NewBoard).
+
+flying_rock(Board, [X,Y], Direction, NewBoard):-
+    direction_map(Direction, [Dx, Dy]),
+    Nx is X + Dx, Ny is Y + Dy,
+    get_piece(Board, [Nx, Ny], NextPiece),
+    piece_map(NextPiece, PieceName), PieceName = 'Sorcerer', !,
+    set_piece(Board, [Nx,Ny], 'R', NewBoard).
+
+flying_rock(Board, [X,Y], Direction, NewBoard):-
+    direction_map(Direction, [Dx, Dy]),
+    Nx is X + Dx, Ny is Y + Dy,
+    get_piece(Board, [Nx, Ny], NextPiece),
+    \+ stops_rock(NextPiece), in_bounds(Board, [Nx,Ny]), !,
+    flying_rock(Board, [Nx, Ny], Direction, NewBoard).
 
 %valid_moves(+GameState, +Player, -ListOfMoves)
 valid_moves([Board,_, _], Player, ListOfMoves):-
@@ -68,14 +128,17 @@ get_moves(Board, [[Piece, [X,Y]] | Rest], ListOfMoves):-
     append(PieceMoves, RestMoves, ListOfMoves).
 
 /*
+[[-1,-1,-1,'R',-1,-1,-1],[-1,-1,'t','d','s',-1,-1],[-1,0,0,'S',0,0,-1],['R',0,0,0,'D',0,'R'],[-1,0,0,'T',0,0,-1],[-1,-1,0,'R',0,-1,-1],[-1,-1,-1,  0,-1, -1,-1]]
+[[-1,-1,-1,'R',-1,-1,-1],[-1,-1,'t','d','s',-1,-1],[-1,0,0,'S',0,0,-1],['R',0,0,0,'D',0,'R'],[-1,0,0, 0 ,0,0,-1],[-1,-1,0,'T',0,-1,-1],[-1,-1,-1,  0,-1, -1,-1]]
 [
     [-1,-1,-1, 'R',-1, -1,-1],
     [-1,-1,'t','d','s',-1,-1],
-    [-1, 0, 0,  0,  0,  0,-1],
-    ['R',0, 0, 'S','D', 0,'R'],
-    [-1, 0, 0,  0,  0,  0,-1],
-    [-1,-1,'0','T', 0, -1,-1],
-    [-1,-1,-1,' R',-1, -1,-1]]
+    [-1, 0, 0, 'S', 0,  0,-1],
+    ['R',0, 0,  0, 'D', 0,'R'],
+    [-1, 0, 0, 'T',  0,  0,-1],
+    [-1,-1, 0, 'R', 0, -1,-1],
+    [-1,-1,-1,  0,-1, -1,-1]
+]
 */
 
 %get_position(+Board, +Piece, -Position)

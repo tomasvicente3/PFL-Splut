@@ -25,6 +25,14 @@ print_rules:-
 
 clear_screen :- write('\33\[2J').
 
+%get_direction(+ListOfDirections, -ChosenDirection)
+get_direction(ListOfDirections, ChosenDirection):-
+    repeat,
+    format("Choose a direction to throw the rock: ~w", [ListOfDirections]), nl,
+    read_char(Char),
+    member(Char, ListOfDirections), !,
+    ChosenDirection = Char. 
+
 read_option(Min, Max, Option) :-
     repeat,
     format('Select an option between ~w and ~w: ', [Min, Max]),

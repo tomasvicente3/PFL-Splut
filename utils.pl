@@ -17,6 +17,11 @@ read_number_aux(X,Acc):-
     read_number_aux(X,Acc1).
 read_number_aux(X,X).
 
+% read_char(-Char)
+read_char(Char) :-
+    get_code(Code),
+    char_code(Char, Code).
+
 writeArray([]).
 writeArray([H|T]):-
     write(H), nl,
