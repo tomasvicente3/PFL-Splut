@@ -31,6 +31,15 @@ read_option(Min, Max, Option) :-
     read_number(Option),
     (between(Min, Max, Option) ->  true ; write('Invalid option! Try again: '), fail).
 
+display_moves(_, 0, _) :- nl.
+display_moves([H|T], N, I) :-
+    [Piece, [X,Y], Direction] = H,
+    piece_map(Piece, PieceName),
+    format('~w. ~w - ~w \n', [I, PieceName, Direction]),
+    N1 is N - 1,
+    I1 is I + 1,
+    display_moves(T, N1, I1).
+
 display_game(Board) :-
 	write('  | A | B | C | D | E | F | G |'), nl,
 	write('   ----------------------------'), nl,

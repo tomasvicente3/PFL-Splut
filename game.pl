@@ -22,7 +22,14 @@ can_move('Sorcerer', Board, [X, Y], Direction):-
     Ocupied=0.
 
 choose_move(Board, Player, Move):-
-    write('To be implemented'), nl.
+    valid_moves([Board,_, _], Player, ListOfMoves),
+    write('Choose a move: \n'),
+
+    length(ListOfMoves, Length),
+    display_moves(ListOfMoves, Length, 1),
+
+    read_option(1, Length, Option),
+    nth1(Option, ListOfMoves, Move).
 
 move(Board, Move, NewBoard):-
     write('To be implemented'), nl.
