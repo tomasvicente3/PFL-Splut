@@ -36,35 +36,50 @@ column_map('K', 11).
 %can_move(+Piece, +Board, +Position, +Direction)
 can_move(_, Board, [X, Y], Direction):-
     direction_map(Direction, [Dx, Dy]),
-    Nx = X + Dx,
-    Ny = Y + Dy,
-    get_piece(Board, [Nx, Ny], Ocupied),
+    Nx is X + Dx,
+    Ny is Y + Dy,
+    get_piece(Board, [Nx, Ny], Ocupied), !,
     Ocupied = 0.
 
 can_move('Troll', Board, [X, Y], Direction):-
     direction_map(Direction, [Dx, Dy]),
-    Nx = X + Dx,
-    Ny = Y + Dy,
-    get_piece(Board, [Nx, Ny], Ocupied),
-    Ocupied = 'R'.
+    Nx is X + Dx,
+    Ny is Y + Dy,
+    get_piece(Board, [Nx, Ny], Ocupied), !,
+    format("Ocupied: ~w", [Ocupied]), nl,
+    Ocupied = 'R',
+    write('troll'),nl.
 
 can_move('Dwarf', Board, [X, Y], Direction):-
     direction_map(Direction, [Dx, Dy]),
-    Nx = X + Dx,
-    Ny = Y + Dy,
-    get_piece(Board, [Nx, Ny], Ocupied),
+    Nx is X + Dx,
+    Ny is Y + Dy,
+    get_piece(Board, [Nx, Ny], Ocupied), !,
     Ocupied = -1, !, fail.
 
 can_move('Dwarf', Board, [X, Y], Direction):-
     direction_map(Direction, [Dx, Dy]),
-    Nx = X + Dx,
-    Ny = Y + Dy, !,
-    can_move('Dwarf', Board, [Nx,Ny], [Dx, Dy]).
+    Nx is X + Dx,
+    Ny is Y + Dy, !,
+    can_move('Dwarf', Board, [Nx,Ny], [Dx, Dy]), !.
 
 %valid_moves(+GameState, +Player, -ListOfMoves)
 valid_moves([Board,_], Player, ListOfMoves):-
-    findall([Piece, [X,Y]], (belongs(Player, Piece), get_position(Board, Piece, [X,Y])), PlayerPieces),
-    get_moves(Board, PlayerPieces, ListOfMoves).
+    findall(Piece, belongs(Player, Piece), PlayerPieces),
+    write(PlayerPieces), nl,
+    get_player_pieces_info(Board, PlayerPieces, PlayerPiecesInfo),
+    write(PlayerPiecesInfo), nl,
+    get_moves(Board, PlayerPiecesInfo, ListOfMoves),
+    write(ListOfMoves), nl.
+
+%get_player_pieces_info(+Board, +PlayerPieces, -PlayerPiecesInfo)
+get_player_pieces_info(_, [], []).
+get_player_pieces_info(Board, [Piece | Rest], [[Piece, Position] | RestInfo]):-
+    get_position(Board, Piece, Position),
+    get_player_pieces_info(Board, Rest, RestInfo).
+get_player_pieces_info(Board, [Piece | Rest], RestInfo):-
+    \+ get_position(Board, Piece, _),
+    get_player_pieces_info(Board, Rest, RestInfo).
 
 %get_moves(+Board, +PlayerPieces, -ListOfMoves)
 get_moves(_ ,[], []).
@@ -94,13 +109,12 @@ check_row([_ | Rest], Piece, ColAcc, X):-
     check_row(Rest, Piece, NewColAcc, X).
 
 
-
 %get_piece(+Board, +Position, -Ocupied)
 get_piece(Board, [X, Y], Ocupied):-
     length(Board, Size),
     X > 0, Y > 0, X =< Size, Y =< Size, !,
     nth1(Y, Board, Row),
-    nth1(X, Row, Ocupied).
+    nth1(X, Row, Ocupied), !.
     
 %init_board(+Size, -Board)
 init_board(7, [
