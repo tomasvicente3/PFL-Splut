@@ -16,3 +16,8 @@ read_number_aux(X,Acc):-
     Acc1 is 10*Acc + (C - 48),
     read_number_aux(X,Acc1).
 read_number_aux(X,X).
+
+writeArray([]).
+writeArray([H|T]):-
+    write(H), nl,
+    writeArray(T).
