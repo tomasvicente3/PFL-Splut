@@ -84,7 +84,7 @@ get_player_pieces_info(Board, [Piece | Rest], RestInfo):-
 get_moves(_ ,[], []).
 get_moves(Board, [[Piece, [X,Y]] | Rest], ListOfMoves):-
     format("Piece: ~w, Position: ~w", [Piece, [X,Y]]), nl,
-    Directions = ['N', 'E', 'S', 'O'],
+    Directions = ['N', 'E', 'S', 'W'],
     findall([Piece, [X,Y], Direction], (member(Direction, Directions), piece_map(Piece, PieceName), can_move(PieceName, Board, [X, Y], Direction)), PieceMoves),
     get_moves(Board, Rest, RestMoves),
     append(PieceMoves, RestMoves, ListOfMoves).
