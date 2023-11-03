@@ -20,6 +20,12 @@ print_options(main_menu) :-
     write('1 - Play\n'),
     write('2 - Rules\n'),
     write('3 - Exit\n').
+
+print_options(board_size) :-
+    write('Choose the board size:\n'),
+    write('1 - Small (7 rows)\n'),
+    write('2 - Medium (9 rows)\n'),
+    write('3 - Large (11 rows)\n').
                                         
 print_rules:-
     write('Splut! is a 2-4 players abstract board game that was invented by Tommy\n'), 

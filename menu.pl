@@ -1,20 +1,20 @@
 %menu(+Option)
 %handles user input
 
-main_menu :-
+menu(main) :-
     repeat,
     clear_screen,
     print_logo,
     print_options(main_menu),
     read_option(1, 3, Option),
-    option(main_menu, Option).
+    option(main_menu, Option).    
+
 
 option(main_menu, 1) :-
     get_game_configurations(Size),
     initial_state(Size, GameState),
 
     [Board, _, _] = GameState,
-    
     clear_screen,
     display_game(Board), !,
 
@@ -33,18 +33,26 @@ option(main_menu, 2):-
 option(main_menu, 3).
 
 get_game_configurations(Size):-
-    get_board_size(Size),
+    menu(board_size, Size),
     get_game_mode(Mode),
     setup_mode(Mode).
 
-%get_board_size(-Size)
-get_board_size(Size):-
+menu(board_size, Size) :-
     repeat,
-    write('Please choose the board height in squares (an odd number between 7 and 11): '),
-    read_number(Size),
-    Remainder is mod(Size, 2),
-    Remainder =:= 1,
-    between(7, 11, Size), !.   
+    clear_screen,
+    print_logo,
+    print_options(board_size),
+    read_option(1, 3, Option),
+    option(board_size, Option, Size).  
+
+option(board_size, 1, Size) :-
+    Size is 7.
+
+option(board_size, 2, Size) :-
+    Size is 9.
+
+option(board_size, 3, Size) :-
+    Size is 11.
 
 %get_game_mode(-Mode)
 get_game_mode(Mode):-

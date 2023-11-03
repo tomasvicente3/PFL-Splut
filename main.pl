@@ -5,4 +5,4 @@
 :- consult('board.pl').
 
 play:-
-    main_menu.
+    menu(main).
