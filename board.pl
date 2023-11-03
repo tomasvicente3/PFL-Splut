@@ -12,6 +12,12 @@ direction_map('S', [0, 1]).
 direction_map('E', [1, 0]).
 direction_map('W', [-1, 0]).
 
+%opposing_direction(?Direction1, ?Direction2)
+opposing_direction('N', 'S').
+opposing_direction('S', 'N').
+opposing_direction('E', 'W').
+opposing_direction('W', 'E').
+
 %piece_map(+Piece, -String)
 piece_map('S', 'Sorcerer').
 piece_map('D', 'Dwarf').
@@ -38,21 +44,21 @@ can_move('Troll', Board, [X, Y], Direction):-
     Nx is X + Dx,
     Ny is Y + Dy,
     get_piece(Board, [Nx, Ny], Ocupied), !,
-    (Ocupied = 'R'; Ocupied=0).
+    (Ocupied = 'R'; Ocupied=0), !.
 
 can_move('Dwarf', Board, [X, Y], Direction):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx,
     Ny is Y + Dy,
     get_piece(Board, [Nx, Ny], Ocupied), !,
-    Ocupied = 0.
-
+    (Ocupied = 0; can_move('Dwarf', Board, [Nx,Ny], Direction)), !.
+/*
 can_move('Dwarf', Board, [X, Y], Direction):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx,
     Ny is Y + Dy, !,
     can_move('Dwarf', Board, [Nx,Ny], [Dx, Dy]), !.
-
+*/
 can_move('Sorcerer', Board, [X, Y], Direction):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx,
@@ -66,7 +72,7 @@ valid_moves([Board,_], Player, ListOfMoves):-
     %write(PlayerPieces), nl,
     get_player_pieces_info(Board, PlayerPieces, PlayerPiecesInfo),
     %write(PlayerPiecesInfo), nl,
-    get_moves(Board, PlayerPiecesInfo, ListOfMoves),
+    get_moves(Board, PlayerPiecesInfo, ListOfMoves).
     %write(ListOfMoves), nl.
 
 %get_player_pieces_info(+Board, +PlayerPieces, -PlayerPiecesInfo)
@@ -86,6 +92,17 @@ get_moves(Board, [[Piece, [X,Y]] | Rest], ListOfMoves):-
     findall([Piece, [X,Y], Direction], (member(Direction, Directions), piece_map(Piece, PieceName), can_move(PieceName, Board, [X, Y], Direction)), PieceMoves),
     get_moves(Board, Rest, RestMoves),
     append(PieceMoves, RestMoves, ListOfMoves).
+
+/*
+[
+    [-1,-1,-1, 'R',-1, -1,-1],
+    [-1,-1,'t','d','s',-1,-1],
+    [-1, 0, 0,  0,  0,  0,-1],
+    ['R',0, 0, 'S','D', 0,'R'],
+    [-1, 0, 0,  0,  0,  0,-1],
+    [-1,-1,'0','T', 0, -1,-1],
+    [-1,-1,-1,' R',-1, -1,-1]]
+*/
 
 %get_position(+Board, +Piece, -Position)
 get_position(Board, Piece, [X, Y]):-
@@ -114,7 +131,7 @@ get_piece(Board, [X, Y], Ocupied):-
     nth1(Y, Board, Row),
     nth1(X, Row, Ocupied), !.
     
-    
+
 %[[-1,-1,-1,'R',-1,-1,-1],[-1,-1,'t','d','s',-1,-1],[-1,0,0,0,0,0,-1],['R',0,0,0,0,0,'R'],[-1,0,0,0,0,0,-1],[-1,-1,'S','D','T',-1,-1],[-1,-1,-1,'R',-1,-1,-1]]
 %init_board(+Size, -Board)
 init_board(7, [

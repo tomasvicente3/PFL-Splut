@@ -29,7 +29,7 @@ game_cycle(GameState, Player):-
     min(Turns, 3, MaxSteps),
     step(GameState, Player, 0, MaxSteps, NewGameState),
     
-    NextPlayer is mod(Player,2)+1,
+    NextPlayer is mod(Player+1,2)+1,
     NextTurns is Turns + 1,
     [NewBoard, NextTurns] = NewerGameState,
     display_game(NewGameState), !,
