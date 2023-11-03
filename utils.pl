@@ -1,6 +1,3 @@
-:- use_module(library(between)).
-:- use_module(library(lists)).
-
 %min(+A, +B, -Min)
 min(A, B, Min):-
     A > B,

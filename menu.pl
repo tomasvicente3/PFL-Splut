@@ -82,14 +82,14 @@ option(game_mode, 2) :-
     assertz(computer(2, Difficulty)).
 
 option(game_mode, 3) :-
-    get_computer_difficulty(Difficulty),
+    menu(computer_difficulty, 1, Difficulty),
     assertz(computer(1, Difficulty)),
     assertz(human(2)).
 
 option(game_mode, 4) :-
-    get_computer_difficulty(Difficulty1),
+    menu(computer_difficulty, 1, Difficulty1),
     assertz(computer(1, Difficulty1)),
-    get_computer_difficulty(Difficulty2),
+    menu(computer_difficulty, 2, Difficulty2),
     assertz(computer(2, Difficulty2)).
 
 menu(computer_difficulty, PlayerNum, Difficulty) :-
