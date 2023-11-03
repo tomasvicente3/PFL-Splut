@@ -41,7 +41,7 @@ column_map('K', 11).
 
 
 %valid_moves(+GameState, +Player, -ListOfMoves)
-valid_moves([Board,_], Player, ListOfMoves):-
+valid_moves([Board,_, _], Player, ListOfMoves):-
     findall(Piece, belongs(Player, Piece), PlayerPieces),
     %write(PlayerPieces), nl,
     get_player_pieces_info(Board, PlayerPieces, PlayerPiecesInfo),
@@ -128,12 +128,11 @@ replace_at_row_aux([H | T], Index, Piece, CurrIdx, [H| NewT]):-
 
 
 %initial_state(+Size, -GameState)
-initial_state(Size, [Board,Turns]):-
+initial_state(Size, [Board, Turns, Steps]):-
     Turns = 1,
-    init_board(Size, Board), !.
+    init_board(Size, Board), 
+    min(Turns, 3, Steps), !.
 
-
-%[[-1,-1,-1,'R',-1,-1,-1],[-1,-1,'t','d','s',-1,-1],[-1,0,0,0,0,0,-1],['R',0,0,0,0,0,'R'],[-1,0,0,0,0,0,-1],[-1,-1,'S','D','T',-1,-1],[-1,-1,-1,'R',-1,-1,-1]]
 %init_board(+Size, -Board)
 init_board(7, [
     [-1,   -1,   -1,   'R',    -1,   -1,   -1],

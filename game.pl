@@ -21,70 +21,38 @@ can_move('Sorcerer', Board, [X, Y], Direction):-
     get_piece(Board, [Nx, Ny], Ocupied), !,
     Ocupied=0.
 
-/*
-%step(+GameState, +Player, +CurrentStep, +MaxStep, -NewGameState)
-step(FinalGameState,_, Step, Step, FinalGameState).
-step(GameState, Player, CurrentStep, MaxStep, FinalGameState):-
-    CurrentStep < MaxStep,
-    choose_move(GameState, Player, Move),
-    move(GameState, Move, NewGameState), !,
-    NewStep is CurrentStep + 1,
-    step(NewGameState, Player, NewStep, MaxStep, FinalGameState).
-*/
+choose_move(Board, Player, Move):-
+    write('To be implemented'), nl.
 
-%game_cycle(+GameState, +Player)
-game_cycle([Board,_], _):-
-    game_over(Board, Winner), !,
-    congratulate(Winner).
-/*
-game_cycle(GameState, Player):-
-    [Board, Turns] = GameState,
-    min(Turns, 3, MaxSteps),
-    step(GameState, Player, 0, MaxSteps, NewGameState),
-    
-    NextPlayer is mod(Player+1,2)+1,
-    NextTurns is Turns + 1,
-    [NewBoard, NextTurns] = NewerGameState,
-    display_game(NewGameState), !,
-    game_cycle(NewerGameState, NextPlayer).
+move(Board, Move, NewBoard):-
+    write('To be implemented'), nl.
 
-%choose_move(+Board, +Player, -Move)
-%jogador escolhe jogada
-choose_move(GameState, human, Move):-
-% interaction to select move TODO
+step([_, _, 0], _, _) :- !.
 
+step([Board, _, Steps], Player, NewBoard):-
+    choose_move(Board, Player, Move),
+    move(Board, Move, NewBoard),
+    display_game(NewBoard),
+    NewSteps is Steps - 1,
+    step([NewBoard, _, NewSteps], Player, _).
 
-%choose_move(+Board, +Player, +ComputerLevel, -Move)
-%computador escolhe jogada
-choose_move(Board, Player, ComputerLevel, Move):-
-    valid_moves(GameState, Moves),
-    choose_move(Level, GameState, Moves, Move).
+game_loop(GameState, _) :-
+    game_over(GameState), !.
 
-/** trocar o choose move aqui? Está nos slides mas não no enunciado aqui está choose_move(Level, GameState, Moves, Move)**//*
-choose_move(Board, Player, 1, Move):-
-    random_select(Move, Moves, _Rest).
+game_loop(GameState, Player) :-
+    [Board, Turn, Steps] = GameState,
+    step([Board, _, Steps], Player, NewBoard),
+    NewTurn is Turn + 1,
+    min(NewTurn, 3, NewSteps),
+    game_loop([NewBoard, NewTurn, NewSteps], Player).
 
-choose_move(Board, Player, 2, Move):-
-    setof(Value-Mv, NewState^( member(Mv, Moves),
-    move(GameState, Mv, NewState),
-    value(NewState, Player, Value) ), [_V-Move|_]).
-% value assumes lower value is better
-
-%move(+GameState, +Move, -NewGameState).
-move([Board, Turns], Move, [NewBoard, NewTurns]):-. %TODO
-
-%value(+GameState, +Player, -Value)
-value([Board, Turns], Player, Value):-.
-*/
-
-
-%game_over(+GameState, -Winner)
-game_over([Board, _], Winner):-
+%game_over(+GameState)
+game_over([Board, _, _]):-
     \+ get_position(Board, 'S', _), !,
-    Winner = 2.
-game_over([Board, _], Winner):-
+    congratulate(2).
+game_over([Board, _, _]):-
     \+ get_position(Board, 's', _), !,
-    Winner = 1.
+    congratulate(1).
 
 congratulate(Winner):-
     format(" You win!\nCongratulations, Player ~w!",[Winner]), nl,

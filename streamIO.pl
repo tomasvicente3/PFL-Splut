@@ -31,7 +31,7 @@ read_option(Min, Max, Option) :-
     read_number(Option),
     (between(Min, Max, Option) ->  true ; write('Invalid option! Try again: '), fail).
 
-display_game([Board,_]) :-
+display_game(Board) :-
 	write('  | A | B | C | D | E | F | G |'), nl,
 	write('   ----------------------------'), nl,
 	display_board_rows(Board, 1).

@@ -18,8 +18,11 @@ print_options :-
 firstMenu(1):-
     get_game_configurations(Size),
     initial_state(Size, GameState),
-    display_game(GameState),
-    game_cycle(GameState, 1).
+
+    [Board, _, _] = GameState,
+    display_game(Board),
+
+    game_loop(GameState, 1).
 
 firstMenu(2):-
     repeat,
