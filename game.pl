@@ -45,6 +45,7 @@ move(_, _, _):-
 step([_, _, 0], _, _) :- !.
 
 step([Board, _, Steps], Player, NewBoard):-
+    format("Player ~w's turn (~w steps left)\n", [Player, Steps]), nl,
     choose_move(Board, Player, Move),
     clear_screen,
     move(Board, Move, NewBoard),
@@ -60,7 +61,8 @@ game_loop(GameState, Player) :-
     step([Board, _, Steps], Player, NewBoard),
     NewTurn is Turn + 1,
     min(NewTurn, 3, NewSteps),
-    game_loop([NewBoard, NewTurn, NewSteps], Player).
+    NewPlayer is 3 - Player,
+    game_loop([NewBoard, NewTurn, NewSteps], NewPlayer).
 
 %game_over(+GameState)
 game_over([Board, _, _]):-

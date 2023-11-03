@@ -20,6 +20,8 @@ firstMenu(1):-
     initial_state(Size, GameState),
 
     [Board, _, _] = GameState,
+    
+    clear_screen,
     display_game(Board), !,
 
     game_loop(GameState, 1).
