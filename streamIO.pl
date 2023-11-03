@@ -1,11 +1,21 @@
-print_logo :-
-    write('\t    _____ ______  _                  ___________\n'),
-    write('\t   / ____|  _   || |      | |    | ||____   ____|\n'),
-    write('\t   | (___| |_|  || |      | |    | |     | |\n'),
-    write('\t   (___ )|  ___/ | |      | |    | |     | |\n'),
-    write('\t   ____) | |     | |_____ | (___/ /      | |\n'),
-    write('\t  |_____/|_|     |_______| (_____/       |_|\n\n\n').
+%--------------GENERAL--------------
+clear_screen :- write('\33\[2J').
 
+read_option(Min, Max, Option) :-
+    repeat,
+    write('\nOption: '),
+    read_number(Option),
+    (between(Min, Max, Option) ->  true ; write('Invalid option! Try again: '), fail).
+
+%--------------MENU--------------
+
+print_logo :-
+    write('  ____    ____    _       _   _   _____ '), nl,
+    write(' / ___|  |  _ \\  | |     | | | | |_   _|'), nl,
+    write(' \\___ \\  | |_) | | |     | | | |   | |  '), nl,
+    write('  ___) | |  __/  | |___  | |_| |   | |  '), nl,
+    write(' |____/  |_|     |_____|  \\___/    |_|  '), nl, nl.
+                                        
 print_rules:-
     write('Splut! is a 2-4 players abstract board game that was invented by Tommy\n'), 
     write('De Coninck in 2009. The game is played on a special board with squares\n'), 
@@ -23,31 +33,7 @@ print_rules:-
     write('from the game. If a Rock lands on a Dwarf\'s head, the Dwarf is removed from the\n'),
     write('board. The game ends when only one player remains or when all players agree to end it.\n\n').
 
-clear_screen :- write('\33\[2J').
-
-%get_direction(+ListOfDirections, -ChosenDirection)
-get_direction(ListOfDirections, ChosenDirection):-
-    repeat,
-    format("Choose a direction to throw the rock: ~w", [ListOfDirections]), nl,
-    read_char(Char),
-    member(Char, ListOfDirections), !,
-    ChosenDirection = Char. 
-
-read_option(Min, Max, Option) :-
-    repeat,
-    format('Select an option between ~w and ~w: ', [Min, Max]),
-    read_number(Option),
-    (between(Min, Max, Option) ->  true ; write('Invalid option! Try again: '), fail).
-
-display_moves(_, 0, _) :- nl.
-display_moves([H|T], N, I) :-
-    [Piece, [X,Y], Direction] = H,
-    piece_map(Piece, PieceName),
-    format('~w. ~w(~w) - ~w \n', [I, PieceName, Piece, Direction]),
-    N1 is N - 1,
-    I1 is I + 1,
-    display_moves(T, N1, I1).
-
+%--------------GAME--------------
 display_game(Board) :-
 	write('  | A | B | C | D | E | F | G |'), nl,
 	write('   ----------------------------'), nl,
@@ -73,3 +59,19 @@ display_board_row([Cell | Rest]) :-
 display_cell(0) :- write(' ').
 display_cell(Cell) :- write(Cell).
 
+display_moves(_, 0, _) :- nl.
+display_moves([H|T], N, I) :-
+    [Piece, [X,Y], Direction] = H,
+    piece_map(Piece, PieceName),
+    format('~w. ~w(~w) - ~w \n', [I, PieceName, Piece, Direction]),
+    N1 is N - 1,
+    I1 is I + 1,
+    display_moves(T, N1, I1).
+
+%get_direction(+ListOfDirections, -ChosenDirection)
+get_direction(ListOfDirections, ChosenDirection):-
+    repeat,
+    format("Choose a direction to throw the rock: ~w", [ListOfDirections]), nl,
+    read_char(Char),
+    member(Char, ListOfDirections), !,
+    ChosenDirection = Char. 

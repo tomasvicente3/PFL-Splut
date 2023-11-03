@@ -1,8 +1,11 @@
+:- consult('streamIO.pl').
 :- consult('utils.pl').
 :- consult('menu.pl').
 :- consult('game.pl').
 :- consult('board.pl').
-:- consult('streamIO.pl').
+
+:- use_module(library(between)).
+:- use_module(library(lists)).
 
 play:-
-    menu.
+    menu(main).
