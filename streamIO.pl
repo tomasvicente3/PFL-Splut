@@ -3,7 +3,7 @@ clear_screen :- write('\33\[2J').
 
 read_option(Min, Max, Option) :-
     repeat,
-    format('\nSelect an option between ~w and ~w: ', [Min, Max]),
+    write('\nOption: '),
     read_number(Option),
     (between(Min, Max, Option) ->  true ; write('Invalid option! Try again: '), fail).
 
@@ -15,17 +15,6 @@ print_logo :-
     write(' \\___ \\  | |_) | | |     | | | |   | |  '), nl,
     write('  ___) | |  __/  | |___  | |_| |   | |  '), nl,
     write(' |____/  |_|     |_____|  \\___/    |_|  '), nl, nl.
-
-print_options(main_menu) :-
-    write('1 - Play\n'),
-    write('2 - Rules\n'),
-    write('3 - Exit\n').
-
-print_options(board_size) :-
-    write('Choose the board size:\n'),
-    write('1 - Small (7 rows)\n'),
-    write('2 - Medium (9 rows)\n'),
-    write('3 - Large (11 rows)\n').
                                         
 print_rules:-
     write('Splut! is a 2-4 players abstract board game that was invented by Tommy\n'), 
