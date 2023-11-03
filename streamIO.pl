@@ -35,7 +35,8 @@ print_rules:-
 
 %--------------GAME--------------
 display_game(Board) :-
-	write('  | A | B | C | D | E | F | G |'), nl,
+    print_logo,
+	write('\n  | A | B | C | D | E | F | G |'), nl,
 	write('   ----------------------------'), nl,
 	display_board_rows(Board, 1).
 

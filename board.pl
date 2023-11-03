@@ -56,6 +56,29 @@ stops_rock('R').
 stops_rock('T').
 stops_rock('t').
 
+%can_move(+Piece, +Board, +Position, +Direction)
+%checks if a piece can move in a certain direction
+can_move('Troll', Board, [X, Y], Direction):-
+    direction_map(Direction, [Dx, Dy]),
+    Nx is X + Dx,
+    Ny is Y + Dy,
+    get_piece(Board, [Nx, Ny], Ocupied), !,
+    (Ocupied = 'R'; Ocupied=0), !.
+
+can_move('Dwarf', Board, [X, Y], Direction):-
+    direction_map(Direction, [Dx, Dy]),
+    Nx is X + Dx,
+    Ny is Y + Dy,
+    get_piece(Board, [Nx, Ny], Ocupied), !,
+    (Ocupied = 0; can_move('Dwarf', Board, [Nx,Ny], Direction)), !.
+
+can_move('Sorcerer', Board, [X, Y], Direction):-
+    direction_map(Direction, [Dx, Dy]),
+    Nx is X + Dx,
+    Ny is Y + Dy,
+    get_piece(Board, [Nx, Ny], Ocupied), !,
+    Ocupied=0.
+
 %can_throw(+Board, +Position, +Direction)
 can_throw(Board, [X, Y], Direction):-
     direction_map(Direction, [Dx, Dy]),

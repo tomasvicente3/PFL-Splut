@@ -1,25 +1,23 @@
-%can_move(+Piece, +Board, +Position, +Direction)
-%checks if a piece can move in a certain direction
-can_move('Troll', Board, [X, Y], Direction):-
-    direction_map(Direction, [Dx, Dy]),
-    Nx is X + Dx,
-    Ny is Y + Dy,
-    get_piece(Board, [Nx, Ny], Ocupied), !,
-    (Ocupied = 'R'; Ocupied=0), !.
+game_loop(GameState, _) :-
+    game_over(GameState), !.
 
-can_move('Dwarf', Board, [X, Y], Direction):-
-    direction_map(Direction, [Dx, Dy]),
-    Nx is X + Dx,
-    Ny is Y + Dy,
-    get_piece(Board, [Nx, Ny], Ocupied), !,
-    (Ocupied = 0; can_move('Dwarf', Board, [Nx,Ny], Direction)), !.
+game_loop([Board, Turn, Steps], Player) :-
+    step([Board, _, Steps], Player, NewBoard),
+    NewTurn is Turn + 1,
+    min(NewTurn, 3, NewSteps),
+    NewPlayer is 3 - Player,
+    game_loop([NewBoard, NewTurn, NewSteps], NewPlayer).
 
-can_move('Sorcerer', Board, [X, Y], Direction):-
-    direction_map(Direction, [Dx, Dy]),
-    Nx is X + Dx,
-    Ny is Y + Dy,
-    get_piece(Board, [Nx, Ny], Ocupied), !,
-    Ocupied=0.
+step([_, _, 0], _, _) :- !.
+
+step([Board, _, Steps], Player, NewBoard):-
+    format("\nPlayer ~w's turn (~w steps left)\n", [Player, Steps]), nl,
+    choose_move(Board, Player, Move),
+    move(Board, Move, NewBoard),
+    clear_screen,
+    display_game(NewBoard),
+    NewSteps is Steps - 1,
+    step([NewBoard, _, NewSteps], Player, _).
 
 choose_move(Board, Player, Move):-
     valid_moves([Board,_, _], Player, ListOfMoves),
@@ -49,29 +47,6 @@ move(Board, [Piece, [X,Y], Direction], NewBoard):-
     set_piece(TempBoard, [Nx, Ny], Piece, TempBoard2),
     throw_rock(TempBoard2, [Nx, Ny], NewBoard), !.
 
-step([_, _, 0], _, _) :- !.
-
-step([Board, _, Steps], Player, NewBoard):-
-    format("Player ~w's turn (~w steps left)\n", [Player, Steps]), nl,
-    choose_move(Board, Player, Move),
-    clear_screen,
-    move(Board, Move, NewBoard),
-    display_game(NewBoard),
-    NewSteps is Steps - 1,
-    step([NewBoard, _, NewSteps], Player, _).
-
-game_loop(GameState, _) :-
-    game_over(GameState), !.
-
-game_loop(GameState, Player) :-
-    [Board, Turn, Steps] = GameState,
-    step([Board, _, Steps], Player, NewBoard),
-    NewTurn is Turn + 1,
-    min(NewTurn, 3, NewSteps),
-    NewPlayer is 3 - Player,
-    game_loop([NewBoard, NewTurn, NewSteps], NewPlayer).
-
-%game_over(+GameState)
 game_over([Board, _, _]):-
     \+ get_position(Board, 'S', _), !,
     congratulate(2).
