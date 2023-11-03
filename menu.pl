@@ -1,21 +1,15 @@
 %menu(+Option)
 %handles user input
 
-menu :-
+main_menu :-
     repeat,
     clear_screen,
     print_logo,
-    print_options,
-    read_number(Option),
-    between(1,3,Option), !,
-    firstMenu(Option).
+    print_options(main_menu),
+    read_option(1, 3, Option),
+    option(main_menu, Option).
 
-print_options :-
-    write('1 - Play\n'),
-    write('2 - Rules\n'),
-    write('3 - Exit\n').
-
-firstMenu(1):-
+option(main_menu, 1) :-
     get_game_configurations(Size),
     initial_state(Size, GameState),
 
@@ -27,7 +21,7 @@ firstMenu(1):-
     game_loop(GameState, 1).
 
 
-firstMenu(2):-
+option(main_menu, 2):-
     repeat,
     clear_screen,
     print_logo,
@@ -36,7 +30,7 @@ firstMenu(2):-
     get_char(_),
     menu.
 
-firstMenu(3).
+option(main_menu, 3).
 
 get_game_configurations(Size):-
     get_board_size(Size),
@@ -55,14 +49,20 @@ get_board_size(Size):-
 %get_game_mode(-Mode)
 get_game_mode(Mode):-
     repeat,
-    write('Please choose the game mode \n 1 - Player vs Player \n 2 - Player vs Computer \n 3 - Computer vs Player \n 4 - Computer vs Computer'),nl,
+    write('Please choose the game mode \n'),
+    write('1 - Player vs Player \n'),
+    write('2 - Player vs Computer \n'),
+    write('3 - Computer vs Player \n'),
+    write('4 - Computer vs Computer'),nl,
     read_number(Mode),
     between(1, 4, Mode), !.
 
 %get_computer_difficulty(-Difficulty)
 get_computer_difficulty(Difficulty):-
     repeat,
-    write('Please choose the computer behaviour (1 - Random, 2 - Greedy): '),nl,
+    write('Please choose the computer behaviour'),
+    write('1 - Random\n'),
+    write('2 - Greedy)'),nl,
     read_number(Difficulty),
     between(1, 2, Difficulty), !.
 
