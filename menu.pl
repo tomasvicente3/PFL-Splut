@@ -27,7 +27,7 @@ firstMenu(2):-
     print_rules,
     write('Press any key to return to the main menu.\n'),
     get_char(_),
-    play.
+    menu.
 
 firstMenu(3) :- true.
 
