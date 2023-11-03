@@ -35,35 +35,32 @@ column_map('I', 9).
 column_map('J', 10).
 column_map('K', 11).
 
-%can_move(+Piece, +Board, +Position, +Direction)
-can_move(_, Board, [X, Y], Direction):-
+can_move('Troll', Board, [X, Y], Direction):-
+    direction_map(Direction, [Dx, Dy]),
+    Nx is X + Dx,
+    Ny is Y + Dy,
+    get_piece(Board, [Nx, Ny], Ocupied), !,
+    (Ocupied = 'R'; Ocupied=0).
+
+can_move('Dwarf', Board, [X, Y], Direction):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx,
     Ny is Y + Dy,
     get_piece(Board, [Nx, Ny], Ocupied), !,
     Ocupied = 0.
 
-can_move('Troll', Board, [X, Y], Direction):-
-    direction_map(Direction, [Dx, Dy]),
-    Nx is X + Dx,
-    Ny is Y + Dy,
-    get_piece(Board, [Nx, Ny], Ocupied), !,
-    format("Ocupied: ~w", [Ocupied]), nl,
-    Ocupied = 'R',
-    write('troll'),nl.
-
-can_move('Dwarf', Board, [X, Y], Direction):-
-    direction_map(Direction, [Dx, Dy]),
-    Nx is X + Dx,
-    Ny is Y + Dy,
-    get_piece(Board, [Nx, Ny], Ocupied), !,
-    Ocupied = -1, !, fail.
-
 can_move('Dwarf', Board, [X, Y], Direction):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx,
     Ny is Y + Dy, !,
     can_move('Dwarf', Board, [Nx,Ny], [Dx, Dy]), !.
+
+can_move('Sorcerer', Board, [X, Y], Direction):-
+    direction_map(Direction, [Dx, Dy]),
+    Nx is X + Dx,
+    Ny is Y + Dy,
+    get_piece(Board, [Nx, Ny], Ocupied), !,
+    Ocupied=0.
 
 %valid_moves(+GameState, +Player, -ListOfMoves)
 valid_moves([Board,_], Player, ListOfMoves):-
@@ -119,6 +116,7 @@ get_piece(Board, [X, Y], Ocupied):-
     nth1(Y, Board, Row),
     nth1(X, Row, Ocupied), !.
     
+
 %init_board(+Size, -Board)
 init_board(7, [
     [-1,   -1,   -1,   'R',    -1,   -1,   -1],
