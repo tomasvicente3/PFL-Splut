@@ -39,9 +39,6 @@ move(Board, [Piece, [X,Y], Direction], NewBoard):-
     set_piece(Board, [X,Y], 0, TempBoard),
     set_piece(TempBoard, [Nx, Ny], Piece, NewBoard).
 
-move(_, _, _):-
-    write('To be implemented'), nl.
-
 step([_, _, 0], _, _) :- !.
 
 step([Board, _, Steps], Player, NewBoard):-
