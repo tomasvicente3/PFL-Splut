@@ -33,6 +33,7 @@ column_map('I', 9).
 column_map('J', 10).
 column_map('K', 11).
 
+%aaaaaaaaaaaa
 %can_move(+Piece, +Board, +Position, +Direction)
 can_move(_, Board, [X, Y], Direction):-
     direction_map(Direction, [Dx, Dy]),
