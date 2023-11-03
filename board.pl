@@ -86,10 +86,11 @@ get_player_pieces_info(Board, [Piece | Rest], RestInfo):-
 %get_moves(+Board, +PlayerPieces, -ListOfMoves)
 get_moves(_ ,[], []).
 get_moves(Board, [[Piece, [X,Y]] | Rest], ListOfMoves):-
-    findall([Piece, [X,Y], Direction], (piece_map(Piece, PieceName), can_move(PieceName, Board, [X, Y], Direction)), PieceMoves),
+    format("Piece: ~w, Position: ~w", [Piece, [X,Y]]), nl,
+    Directions = ['N', 'E', 'S', 'O'],
+    findall([Piece, [X,Y], Direction], (member(Direction, Directions), piece_map(Piece, PieceName), can_move(PieceName, Board, [X, Y], Direction)), PieceMoves),
     get_moves(Board, Rest, RestMoves),
     append(PieceMoves, RestMoves, ListOfMoves).
-
 
 %get_position(+Board, +Piece, -Position)
 get_position(Board, Piece, [X, Y]):-
