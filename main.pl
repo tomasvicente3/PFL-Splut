@@ -70,9 +70,4 @@ value([Board, Turns], Player, Value):-.
 
 
 play:-
-    repeat,
-    write('\33\[2J'),
-    print_logo,
-    read_number(Option),
-    between(1,3,Option), !,
-    menu(Option).
+    menu.

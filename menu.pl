@@ -1,16 +1,41 @@
 %menu(+Option)
 %handles user input
-menu(1):-
+menu :-
+    repeat,
+    write('\33\[2J'),
+    print_logo,
+    print_options,
+    read_number(Option),
+    between(1,3,Option), !,
+    firstMenu(Option).
+
+print_options :-
+    write('1 - Play\n'),
+    write('2 - Rules\n'),
+    write('3 - Exit\n').
+
+firstMenu(1):-
     get_game_configurations(Size),
     initial_state(Size, GameState),
     display_game(GameState).
     %game_cycle(GameState, 1).
 
-menu(2):-
-    %rules, !,
+firstMenu(2):-
+    repeat,
+    write('\33\[2J'),
+    print_logo,
+    print_rules,
+    write('Press any key to return to the main menu.\n'),
+    get_char(_),
     play.
 
-menu(3).
+firstMenu(3) :- true.
+
+get_game_configurations(Size):-
+    get_board_size(Size),
+    get_game_mode(Mode),
+    setup_mode(Mode).
+
 
 %get_board_size(-Size)
 get_board_size(Size):-
@@ -24,7 +49,7 @@ get_board_size(Size):-
 %get_game_mode(-Mode)
 get_game_mode(Mode):-
     repeat,
-    write('Please choose the game mode (1 - Player vs Player, 2 - Player vs Computer, 3 - Computer vs Player, 4 - Computer vs Computer): '),nl,
+    write('Please choose the game mode \n 1 - Player vs Player \n 2 - Player vs Computer \n 3 - Computer vs Player \n 4 - Computer vs Computer'),nl,
     read_number(Mode),
     between(1, 4, Mode), !.
 
@@ -52,12 +77,3 @@ setup_mode(4):-
     assertz(computer(1, Difficulty1)),
     get_computer_difficulty(Difficulty2),
     assertz(computer(2, Difficulty2)).
-
-%get_players
-get_players:-
-    get_game_mode(Mode),
-    setup_mode(Mode).
-
-get_game_configurations(Size):-
-    get_board_size(Size),
-    get_players.
