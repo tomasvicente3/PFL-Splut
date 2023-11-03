@@ -23,6 +23,14 @@ print_rules:-
     write('from the game. If a Rock lands on a Dwarf\'s head, the Dwarf is removed from the\n'),
     write('board. The game ends when only one player remains or when all players agree to end it.\n\n').
 
+clear_screen :- write('\33\[2J').
+
+read_option(Min, Max, Option) :-
+    repeat,
+    format('Select an option between ~w and ~w: ', [Min, Max]),
+    read_number(Option),
+    (between(Min, Max, Option) ->  true ; write('Invalid option! Try again: '), fail).
+
 display_game([Board,_]) :-
 	write('  | A | B | C | D | E | F | G |'), nl,
 	write('   ----------------------------'), nl,
@@ -47,3 +55,4 @@ display_board_row([Cell | Rest]) :-
 
 display_cell(0) :- write(' ').
 display_cell(Cell) :- write(Cell).
+

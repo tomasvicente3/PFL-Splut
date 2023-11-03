@@ -1,8 +1,9 @@
 %menu(+Option)
 %handles user input
+
 menu :-
     repeat,
-    write('\33\[2J'),
+    clear_screen,
     print_logo,
     print_options,
     read_number(Option),
@@ -17,12 +18,12 @@ print_options :-
 firstMenu(1):-
     get_game_configurations(Size),
     initial_state(Size, GameState),
-    display_game(GameState).
-    %game_cycle(GameState, 1).
+    display_game(GameState),
+    game_cycle(GameState, 1).
 
 firstMenu(2):-
     repeat,
-    write('\33\[2J'),
+    clear_screen,
     print_logo,
     print_rules,
     write('Press any key to return to the main menu.\n'),
@@ -35,7 +36,6 @@ get_game_configurations(Size):-
     get_board_size(Size),
     get_game_mode(Mode),
     setup_mode(Mode).
-
 
 %get_board_size(-Size)
 get_board_size(Size):-
