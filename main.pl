@@ -39,10 +39,6 @@ game_cycle(GameState, Player):-
 %game_over(+GameState, -Winner)
 game_over(Board, Winner):-. % TODO
 
-%valid_moves(+GameState, +Player, -ListOfMoves)
-valid_moves([Board,Turns], Player, ListOfMoves):-
-    findall(Move, move(GameState, Move, NewState), Moves).
-
 %choose_move(+Board, +Player, -Move)
 %jogador escolhe jogada
 choose_move(GameState, human, Move):-
