@@ -1,3 +1,5 @@
+:- use_module(library(lists)).
+
 %belongs(+Player, +Piece)
 belongs(1, 'S').
 belongs(1, 'D').
@@ -33,7 +35,6 @@ column_map('I', 9).
 column_map('J', 10).
 column_map('K', 11).
 
-%aaaaaaaaaaaa
 %can_move(+Piece, +Board, +Position, +Direction)
 can_move(_, Board, [X, Y], Direction):-
     direction_map(Direction, [Dx, Dy]),
@@ -86,7 +87,7 @@ get_player_pieces_info(Board, [Piece | Rest], RestInfo):-
 get_moves(_ ,[], []).
 get_moves(Board, [[Piece, [X,Y]] | Rest], ListOfMoves):-
     findall([Piece, [X,Y], Direction], (piece_map(Piece, PieceName), can_move(PieceName, Board, [X, Y], Direction)), PieceMoves),
-    get_moves(Rest, RestMoves),
+    get_moves(Board, Rest, RestMoves),
     append(PieceMoves, RestMoves, ListOfMoves).
 
 
@@ -127,6 +128,8 @@ init_board(7, [
     [-1,   -1,   'S',  'D',   'T',   -1,   -1],
     [-1,   -1,   -1,   'R',    -1,   -1,   -1]
 ]).
+
+
 init_board(9, [
     [-1,   -1,   -1,    -1,    'R',   -1,   -1,   -1,   -1],
     [-1,   -1,   -1,   't',    'd',   's',  -1,   -1,   -1],
