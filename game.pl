@@ -31,7 +31,15 @@ choose_move(Board, Player, Move):-
     read_option(1, Length, Option),
     nth1(Option, ListOfMoves, Move).
 
-move(Board, Move, NewBoard):-
+move(Board, [Piece, [X,Y], Direction], NewBoard):-
+    direction_map(Direction, [Dx, Dy]),
+    Nx is X + Dx, Ny is Y + Dy,
+    get_piece(Board, [Nx, Ny], Ocupied),
+    Ocupied = 0, !,
+    set_piece(Board, [X,Y], 0, TempBoard),
+    set_piece(TempBoard, [Nx, Ny], Piece, NewBoard).
+
+move(_, _, _):-
     write('To be implemented'), nl.
 
 step([_, _, 0], _, _) :- !.

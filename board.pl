@@ -133,6 +133,7 @@ initial_state(Size, [Board, Turns, Steps]):-
     init_board(Size, Board), 
     min(Turns, 3, Steps), !.
 
+%[[-1,-1,-1,'R',-1,-1,-1],[-1,-1,'t','d','s',-1,-1],[-1,0,0,0,0,0,-1],['R',0,0,0,0,0,'R'],[-1,0,0,0,0,0,-1],[-1,-1,'S','D','T',-1,-1],[-1,-1,-1,'R',-1,-1,-1]]
 %init_board(+Size, -Board)
 init_board(7, [
     [-1,   -1,   -1,   'R',    -1,   -1,   -1],
