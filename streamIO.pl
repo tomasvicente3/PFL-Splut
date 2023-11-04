@@ -89,9 +89,45 @@ display_cell(Cell) :- write(Cell).
 
 display_moves(_, 0, _) :- nl.
 display_moves([H|T], N, I) :-
-    [Piece, [X,Y], Direction] = H,
+    [Piece, [X,Y], Direction, MoveType] = H,
+    MoveType = emptySpace,
+
     piece_map(Piece, PieceType),
-    format('~w. ~w(~w) - ~w \n', [I, PieceType, Piece, Direction]),
+    format('~w. ~w(~w) ~w \n', [I, PieceType, Piece, Direction]),
+
+    N1 is N - 1,
+    I1 is I + 1,
+    display_moves(T, N1, I1).
+
+display_moves([H|T], N, I) :-
+    [Piece, [X,Y], Direction, MoveType] = H,
+    MoveType = trollPull,
+
+    piece_map(Piece, PieceType),
+    format('~w. ~w(~w) ~w and pull rock behind \n', [I, PieceType, Piece, Direction]),
+
+    N1 is N - 1,
+    I1 is I + 1,
+    display_moves(T, N1, I1).
+
+display_moves([H|T], N, I) :-
+    [Piece, [X,Y], Direction, MoveType] = H,
+    MoveType = trollThrow,
+
+    piece_map(Piece, PieceType),
+    format('~w. ~w(~w) ~w and throw rock \n', [I, PieceType, Piece, Direction]),
+
+    N1 is N - 1,
+    I1 is I + 1,
+    display_moves(T, N1, I1).
+
+display_moves([H|T], N, I) :-
+    [Piece, [X,Y], Direction, MoveType] = H,
+    MoveType = dwarfPush,
+
+    piece_map(Piece, PieceType),
+    format('~w. ~w(~w) ~w and push every piece \n', [I, PieceType, Piece, Direction]),
+
     N1 is N - 1,
     I1 is I + 1,
     display_moves(T, N1, I1).

@@ -52,6 +52,19 @@ get_index_letter(9, 'I').
 get_index_letter(10, 'J').
 get_index_letter(11, 'K').
 
+%can_be_thrown_through(+Piece)
+can_be_thrown_through(0).
+can_be_thrown_through('D').
+can_be_thrown_through('d').
+
+
+
+%stops_rock(+Piece)
+stops_rock(-1).
+stops_rock('R').
+stops_rock('T').
+stops_rock('t').
+
 %init_board(+Size, -Board)
 init_board(7, [
     [-1,   -1,   -1,   'R',    -1,   -1,   -1],

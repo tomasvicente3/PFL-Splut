@@ -15,12 +15,7 @@ option(main_menu, 1) :-
     menu(board_size, Size),
     menu(game_mode),
 
-    initial_state(Size, GameState),
-    clear_screen,
-
-    [Board, _, _] = GameState,
-    display_game(Board), !,
-
+    initial_state(Size, GameState),!,
     game_loop(GameState, 1).
 
 option(main_menu, 2):-
