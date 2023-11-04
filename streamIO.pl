@@ -89,7 +89,7 @@ display_cell(Cell) :- write(Cell).
 
 display_moves(_, 0, _) :- nl.
 display_moves([H|T], N, I) :-
-    [Piece, [X,Y], Direction] = H,
+    [Piece, _, Direction] = H,
     piece_map(Piece, PieceType),
     format('~w. ~w(~w) - ~w \n', [I, PieceType, Piece, Direction]),
     N1 is N - 1,

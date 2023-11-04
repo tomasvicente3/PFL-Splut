@@ -156,9 +156,6 @@ replace_at_row_aux([H | T], Index, Piece, CurrIdx, [H| NewT]):-
     CurrIdx < Index,
     NextIdx is CurrIdx + 1,
     replace_at_row_aux(T, Index, Piece, NextIdx, NewT).
-
 %initial_state(+Size, -GameState)
-initial_state(Size, [Board, Turns, Steps]):-
-    Turns = 1,
-    init_board(Size, Board), 
-    min(Turns, 3, Steps), !.
+initial_state(Size, [Board, 1, 1]):-
+    init_board(Size, Board), !.

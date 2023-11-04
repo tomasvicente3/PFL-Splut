@@ -49,13 +49,11 @@ print_options(board_size) :-
     write('3 - Large (11 rows)\n').
 
 option(board_size, 1, Size) :-
-    Size is 7.
-
+    Size = 7.
 option(board_size, 2, Size) :-
-    Size is 9.
-
+    Size = 9.
 option(board_size, 3, Size) :-
-    Size is 11.
+    Size = 11.
 
 menu(game_mode) :-
     repeat,
