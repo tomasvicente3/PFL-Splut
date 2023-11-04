@@ -36,25 +36,52 @@ print_rules:-
 %--------------GAME--------------
 display_game(Board) :-
     print_logo,
-	write('\n  | A | B | C | D | E | F | G |'), nl,
-	write('   ----------------------------'), nl,
-	display_board_rows(Board, 1).
+    length(Board, Length),
+    display_header(Length),
+    display_bar(Length),
+	display_board_rows(Board, 1, Length).
 
-display_board_rows([], _).
-display_board_rows([Row | Rest], N) :-
-	write(N),
-	write(' |'),
+display_header(Length):-
+    write('\n   '),
+    display_header_aux(Length, 1).
+
+display_header_aux(Length, Index) :- Index > Length, !, write('|\n').
+display_header_aux(Length, Index) :-
+    write('| '),
+    get_index_letter(Index, Letter),
+    write(Letter),
+    write(' '),
+    I1 is Index + 1,
+    display_header_aux(Length, I1).
+
+display_bar(Length):-
+    write('   '),
+    display_bar_aux(Length, 1).
+
+display_bar_aux(Length, Index) :- Index > Length, !, write('-\n').
+display_bar_aux(Length, Index) :-
+    write('----'),
+    I1 is Index + 1,
+    display_bar_aux(Length, I1).
+
+
+display_board_rows([], _, _) :- write('|\n').
+
+display_board_rows([Row | Rest], N, Length) :-
+    format('~w ', [N]),
+    (N < 10 -> write(' '); true),
 	display_board_row(Row),
-	nl,
-	write('   ----------------------------'), nl,
+    display_bar(Length),
 	N1 is N + 1,
-	display_board_rows(Rest, N1).
+	display_board_rows(Rest, N1, Length).
 
-display_board_row([]) :- write('|').
+display_board_row([]) :- write('|\n').
+
 display_board_row([-1 | Rest]) :- write('    '), display_board_row(Rest).
 display_board_row([Cell | Rest]) :-
-	write(' | '),
+	write('| '),
 	display_cell(Cell),
+    write(' '),
 	display_board_row(Rest).
 
 display_cell(0) :- write(' ').

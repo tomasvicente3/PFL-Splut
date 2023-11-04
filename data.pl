@@ -39,6 +39,19 @@ column_map('I', 9).
 column_map('J', 10).
 column_map('K', 11).
 
+%get_index_letter(+Index, -Letter)
+get_index_letter(1, 'A').
+get_index_letter(2, 'B').
+get_index_letter(3, 'C').
+get_index_letter(4, 'D').
+get_index_letter(5, 'E').
+get_index_letter(6, 'F').
+get_index_letter(7, 'G').
+get_index_letter(8, 'H').
+get_index_letter(9, 'I').
+get_index_letter(10, 'J').
+get_index_letter(11, 'K').
+
 %init_board(+Size, -Board)
 init_board(7, [
     [-1,   -1,   -1,   'R',    -1,   -1,   -1],
@@ -71,8 +84,8 @@ init_board(11, [
     [-1,    0,    0,    0,      0,     0,    0,    0,    0,    0,   -1],
     ['R',   0,    0,    0,      0,     0,    0,    0,    0,    0,   'R'],
     [-1,    0,    0,    0,      0,     0,    0,    0,    0,    0,   -1],
-    [-1,   -1,    0,    0,      0,     0,    0,    0,    0,    0,   -1],
-    [-1,   -1,   -1,    0,      0,     0,    0,    0,    0,    0,    0],
+    [-1,   -1,    0,    0,      0,     0,    0,    0,    0,    -1,   -1],
+    [-1,   -1,   -1,    0,      0,     0,    0,    0,    -1,    -1,    -1],
     [-1,   -1,   -1,   -1,     'S',   'D',  'T',  -1,   -1,   -1,   -1],
     [-1,   -1,   -1,   -1,     -1,    'R',   -1,  -1,   -1,   -1,   -1]
 ]).
