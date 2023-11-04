@@ -65,8 +65,6 @@ can_push(Board, [X, Y], Direction):-
     get_piece(Board, [Nx, Ny], Ocupied), !,
     (Ocupied = 0; can_move('Dwarf', Board, [Nx,Ny], Direction, _)), !.
 
-
-
 %valid_moves(+GameState, +Player, -ListOfMoves)
 valid_moves([Board,_, _], Player, ListOfMoves):-
     findall(Piece, belongs(Player, Piece), PlayerPieces),
@@ -146,18 +144,12 @@ can_throw(Board, [X, Y], Direction):-
     get_piece(Board, [Nx, Ny], Ocupied),
     can_be_thrown_through(Ocupied), !.
 
-
-%Going to descoment to test
-
-
 %in_bounds(+Board, +Position)
 in_bounds(Board, [X,Y]):-
     X > 0, Y > 0,
     length(Board, Size),
     X =< Size, Y =< Size.
 
-
-/*
 %throw_rock(+Board, +Position, -NewBoard)
 throw_rock(Board, [X,Y], NewBoard):-
     Directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'],
@@ -169,12 +161,15 @@ throw_rock(Board, [X,Y], NewBoard):-
     flying_rock(Board, [Nx,Ny], ChosenDirection, NewBoard).
 
 %flying_rock(+Board, +Position, +Direction, -NewBoard)
+%If the next position is out of bounds, the rock stops
+
 flying_rock(Board, [X,Y], Direction, NewBoard):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
     \+ in_bounds(Board, [Nx,Ny]), !,
     set_piece(Board, [X,Y], 'R', NewBoard).
 
+%If the  next pos is a piece that stops the rock, the rock stops
 flying_rock(Board, [X,Y], Direction, NewBoard):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
@@ -182,6 +177,7 @@ flying_rock(Board, [X,Y], Direction, NewBoard):-
     stops_rock(NextPiece), !,
     set_piece(Board, [X,Y], 'R', NewBoard).
 
+%If the next pos is a sorcerer, the rock stops and the sorcerer dies
 flying_rock(Board, [X,Y], Direction, NewBoard):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
@@ -189,10 +185,10 @@ flying_rock(Board, [X,Y], Direction, NewBoard):-
     piece_map(NextPiece, PieceType), PieceType = 'Sorcerer', !,
     set_piece(Board, [Nx,Ny], 'R', NewBoard).
 
+%If the next pos is unoccupied or occupied by a piece that doesn't stop the rock, the rock keeps flying(Its missing the case where the piece doesnt stop the rock but theres no more space to fly after)
 flying_rock(Board, [X,Y], Direction, NewBoard):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
     get_piece(Board, [Nx, Ny], NextPiece),
     \+ stops_rock(NextPiece), in_bounds(Board, [Nx,Ny]), !,
     flying_rock(Board, [Nx, Ny], Direction, NewBoard).
-*/

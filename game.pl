@@ -36,11 +36,7 @@ move(Board, [Piece, [X,Y], Direction, emptySpace], NewBoard):-
     set_piece(Board, [X,Y], 0, TempBoard),
     set_piece(TempBoard, [Nx, Ny], Piece, NewBoard).
 
-%move([[-1,-1,-1,'R',-1,-1,-1],[-1,-1,'t',0,s,-1,-1],[-1,0,0,'d',0,0,-1],['R',0,0,'D',0,0,'R'],[-1,0,0,0,0,0,-1],[-1,-1,'S','T',0,-1,-1],[-1,-1,-1,'R',-1,-1,-1]], [T,[4,6],'UP',trollPull], NewBoard).
 
-/*Movimentar o troll para a ñova position, movimentar a rocha atrás para a posição inicial do troll
-Nova posição da nossa piece, colocar a rocha na posição inicial da nossa piece, a posição antiga da rocha fica vazia
-*/
 move(Board, [Piece, [X,Y], Direction, trollPull], NewBoard):-
     %Mover a nossa piece
     direction_map(Direction, [Dx, Dy]),
@@ -61,9 +57,14 @@ move(Board, [Piece, [X,Y], Direction, trollPull], NewBoard):-
     set_piece(TempBoard2, [Nx2, Ny2], 0, NewBoard), !,
     format("Removed rock Board ~w\n", [NewBoard]), nl.
 
-
 move(Board, [Piece, [X,Y], Direction, trollThrow], NewBoard):-
-    write('Havent implemented troll pull yet'), nl.
+    direction_map(Direction, [Dx, Dy]),
+    Nx is X + Dx, Ny is Y + Dy,
+    get_piece(Board, [Nx, Ny], Ocupied),
+    piece_map(Piece, PieceType),
+    set_piece(Board, [X,Y], 0, TempBoard),
+    set_piece(TempBoard, [Nx, Ny], Piece, TempBoard2),
+    throw_rock(TempBoard2, [Nx, Ny], NewBoard), !.
 
 move(Board, [Piece, [X,Y], Direction, dwarfPush], NewBoard):-
     write('Havent implemented troll pull yet'), nl.
@@ -81,22 +82,3 @@ congratulate(Winner):-
     get_char(_),
     menu(main).
 
-/*
-move(Board, [Piece, [X,Y], Direction], NewBoard):-
-    direction_map(Direction, [Dx, Dy]),
-    Nx is X + Dx, Ny is Y + Dy,
-    get_piece(Board, [Nx, Ny], Ocupied),
-    Ocupied = 0, !,
-    set_piece(Board, [X,Y], 0, TempBoard),
-    set_piece(TempBoard, [Nx, Ny], Piece, NewBoard).
-
-move(Board, [Piece, [X,Y], Direction], NewBoard):-
-    direction_map(Direction, [Dx, Dy]),
-    Nx is X + Dx, Ny is Y + Dy,
-    get_piece(Board, [Nx, Ny], Ocupied),
-    piece_map(Piece, PieceType),
-    Ocupied = 'R', PieceType = 'Troll', !,
-    set_piece(Board, [X,Y], 0, TempBoard),
-    set_piece(TempBoard, [Nx, Ny], Piece, TempBoard2),
-    throw_rock(TempBoard2, [Nx, Ny], NewBoard), !.
-*/
