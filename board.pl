@@ -1,8 +1,6 @@
 %initial_state(+Size, -GameState)
-initial_state(Size, [Board, Turns, Steps]):-
-    Turns = 1,
-    init_board(Size, Board), 
-    min(Turns, 3, Steps), !.
+initial_state(Size, [Board, 1, 1]):-
+    init_board(Size, Board), !.
 
 
 %can_move(+Piece, +Board, +Position, +Direction, -MoveType)

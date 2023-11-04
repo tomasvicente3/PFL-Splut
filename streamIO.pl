@@ -89,7 +89,7 @@ display_cell(Cell) :- write(Cell).
 
 display_moves(_, 0, _) :- nl.
 display_moves([H|T], N, I) :-
-    [Piece, [X,Y], Direction, MoveType] = H,
+    [Piece, _, Direction, MoveType] = H,
     MoveType = emptySpace,
 
     piece_map(Piece, PieceType),
@@ -100,7 +100,7 @@ display_moves([H|T], N, I) :-
     display_moves(T, N1, I1).
 
 display_moves([H|T], N, I) :-
-    [Piece, [X,Y], Direction, MoveType] = H,
+    [Piece, _, Direction, MoveType] = H,
     MoveType = trollPull,
 
     piece_map(Piece, PieceType),
@@ -111,7 +111,7 @@ display_moves([H|T], N, I) :-
     display_moves(T, N1, I1).
 
 display_moves([H|T], N, I) :-
-    [Piece, [X,Y], Direction, MoveType] = H,
+    [Piece, _, Direction, MoveType] = H,
     MoveType = trollThrow,
 
     piece_map(Piece, PieceType),
@@ -122,7 +122,7 @@ display_moves([H|T], N, I) :-
     display_moves(T, N1, I1).
 
 display_moves([H|T], N, I) :-
-    [Piece, [X,Y], Direction, MoveType] = H,
+    [Piece, _, Direction, MoveType] = H,
     MoveType = dwarfPush,
 
     piece_map(Piece, PieceType),

@@ -8,15 +8,14 @@ game_loop([Board, Turn, Steps], Player) :-
     NewPlayer is 3 - Player,
     game_loop([NewBoard, NewTurn, NewSteps], NewPlayer).
 
+step([NewBoard, _, 0], _, NewBoard) :- !.
 step([Board, _, Steps], Player, NewBoard):-
-    %clear_screen,
-    display_game(Board),
-    format("~w", [Board]), nl,
     format("\nPlayer ~w's turn (~w steps left)\n", [Player, Steps]), nl,
     choose_move(Board, Player, Move),
-    move(Board, Move, NewBoard),
+    move(Board, Move, AccBoard),
+    display_game(AccBoard),
     NewSteps is Steps - 1,
-    (NewSteps > 0 -> step([NewBoard, _, NewSteps], Player, FinalBoard); FinalBoard = NewBoard).
+    step([AccBoard, _, NewSteps], Player, NewBoard).
 
 choose_move(Board, Player, Move):-
     valid_moves([Board,_, _], Player, ListOfMoves),
@@ -80,7 +79,7 @@ congratulate(Winner):-
     format(" You win!\nCongratulations, Player ~w!",[Winner]), nl,
     write('Press any key to return to the main menu.\n'),
     get_char(_),
-    menu.
+    menu(main).
 
 /*
 move(Board, [Piece, [X,Y], Direction], NewBoard):-
