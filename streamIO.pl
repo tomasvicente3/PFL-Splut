@@ -69,10 +69,15 @@ display_moves([H|T], N, I) :-
     I1 is I + 1,
     display_moves(T, N1, I1).
 
-%get_direction(+ListOfDirections, -ChosenDirection)
-get_direction(ListOfDirections, ChosenDirection):-
-    repeat,
-    format("Choose a direction to throw the rock: ~w", [ListOfDirections]), nl,
-    read_char(Char),
-    member(Char, ListOfDirections), !,
-    ChosenDirection = Char. 
+display_directions(_, 0, _) :- nl.
+display_directions([Direction|T], N, I) :-
+    format('~w. ~w \n', [I, Direction]),
+    N1 is N - 1,
+    I1 is I + 1,
+    display_directions(T, N1, I1).
+
+choose_direction(ListOfDirections, ChosenDirection):-
+    length(ListOfDirections, Length),
+    display_directions(ListOfDirections, Length, 1),
+    read_option(1, Length, Option),
+    nth1(Option, ListOfDirections, ChosenDirection).

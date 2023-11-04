@@ -7,16 +7,16 @@ belongs(2, 'd').
 belongs(2, 't').
 
 %direction_map(+Direction, -[Dx, Dy])
-direction_map('N', [0, -1]).
-direction_map('S', [0, 1]).
-direction_map('E', [1, 0]).
-direction_map('W', [-1, 0]).
+direction_map('UP', [0, -1]).
+direction_map('DOWN', [0, 1]).
+direction_map('RIGHT', [1, 0]).
+direction_map('LEFT', [-1, 0]).
 
 %opposing_direction(?Direction1, ?Direction2)
-opposing_direction('N', 'S').
-opposing_direction('S', 'N').
-opposing_direction('E', 'W').
-opposing_direction('W', 'E').
+opposing_direction('UP', 'DOWN').
+opposing_direction('DOWN', 'UP').
+opposing_direction('RIGHT', 'LEFT').
+opposing_direction('LEFT', 'RIGHT').
 
 %piece_map(+Piece, -String)
 piece_map('S', 'Sorcerer').
@@ -88,9 +88,10 @@ can_throw(Board, [X, Y], Direction):-
 
 %throw_rock(+Board, +Position, -NewBoard)
 throw_rock(Board, [X,Y], NewBoard):-
-    Directions = ['N', 'E', 'S', 'W'],
+    Directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'],
     findall(Direction, (member(Direction, Directions), can_throw(Board, [X,Y], Direction)), ListOfDirections),!,
-    get_direction(ListOfDirections, ChosenDirection),
+    write('\nChoose a direction to throw the rock: \n'),
+    choose_direction(ListOfDirections, ChosenDirection),
     direction_map(ChosenDirection, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
     flying_rock(Board, [Nx,Ny], ChosenDirection, NewBoard).
@@ -145,7 +146,7 @@ get_player_pieces_info(Board, [Piece | Rest], RestInfo):-
 get_moves(_ ,[], []).
 get_moves(Board, [[Piece, [X,Y]] | Rest], ListOfMoves):-
     %format("Piece: ~w, Position: ~w", [Piece, [X,Y]]), nl,
-    Directions = ['N', 'E', 'S', 'W'],
+    Directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'],
     findall([Piece, [X,Y], Direction], (member(Direction, Directions), piece_map(Piece, PieceName), can_move(PieceName, Board, [X, Y], Direction)), PieceMoves),
     get_moves(Board, Rest, RestMoves),
     append(PieceMoves, RestMoves, ListOfMoves).
@@ -205,7 +206,6 @@ initial_state(Size, [Board, Turns, Steps]):-
     init_board(Size, Board), 
     min(Turns, 3, Steps), !.
 
-%[[-1,-1,-1,'R',-1,-1,-1],[-1,-1,'t','d','s',-1,-1],[-1,0,0,0,0,0,-1],['R',0,0,0,0,0,'R'],[-1,0,0,0,0,0,-1],[-1,-1,'S','D','T',-1,-1],[-1,-1,-1,'R',-1,-1,-1]]
 %init_board(+Size, -Board)
 init_board(7, [
     [-1,   -1,   -1,   'R',    -1,   -1,   -1],
