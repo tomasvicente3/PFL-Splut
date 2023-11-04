@@ -162,7 +162,6 @@ throw_rock(Board, [X,Y], NewBoard):-
 
 %flying_rock(+Board, +Position, +Direction, -NewBoard)
 %If the next position is out of bounds, the rock stops
-
 flying_rock(Board, [X,Y], Direction, NewBoard):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
@@ -185,7 +184,7 @@ flying_rock(Board, [X,Y], Direction, NewBoard):-
     piece_map(NextPiece, PieceType), PieceType = 'Sorcerer', !,
     set_piece(Board, [Nx,Ny], 'R', NewBoard).
 
-%If the next pos is unoccupied or occupied by a piece that doesn't stop the rock, the rock keeps flying(Its missing the case where the piece doesnt stop the rock but theres no more space to fly after)
+%If the next pos is unoccupied or occupied by a piece that doesn't stop the rock, the rock keeps flying
 flying_rock(Board, [X,Y], Direction, NewBoard):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,

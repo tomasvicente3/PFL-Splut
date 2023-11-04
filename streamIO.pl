@@ -144,3 +144,31 @@ choose_direction(ListOfDirections, ChosenDirection):-
     display_directions(ListOfDirections, Length, 1),
     read_option(1, Length, Option),
     nth1(Option, ListOfDirections, ChosenDirection).
+
+/*
+
+*/
+print_congratulations(1) :-
+    write('  ____   _         _  __   __ _____  ____      _ '), nl,
+    write(' |  _ \\ | |       / \\ \\ \\ / /| ____||  _ \\    / |'), nl,
+    write(' | |_) || |      / _ \\ \\ V / |  _|  | |_) |   | |'), nl,
+    write(' |  __/ | |___  / ___ \\ | |  | |___ |  _ <    | |'), nl,
+    write(' |_|    |_____|/_/  _\\_\\|_|  |_____||_| \\_\\   |_|'), nl,
+    write('                                                 '), nl,
+    write('         \\ \\      / // _ \\ | \\ | |               '),  nl,       
+    write('          \\ \\ /\\ / /| | | ||  \\| |               '), nl,        
+    write('           \\ V  V / | |_| || |\\  |               '),   nl,      
+    write('            \\_/\\_/   \\___/ |_| \\_|               \n\n').
+
+
+print_congratulations(2) :-
+    write('  ____   _         _  __   __ _____  ____     ____  '), nl,
+    write(' |  _ \\ | |       / \\ \\ \\ / /| ____||  _ \\   |___ \\ '), nl,
+    write(' | |_) || |      / _ \\ \\ V / |  _|  | |_) |    __) |'), nl,
+    write(' |  __/ | |___  / ___ \\ | |  | |___ |  _ <    / __/ '), nl,
+    write(' |_|    |_____|/_/  _\\_\\|_|  |_____||_| \\_\\  |_____|'), nl,
+    write('                                                    '),nl,
+    write('         \\ \\      / // _ \\ | \\ | |                  '), nl,        
+    write('          \\ \\ /\\ / /| | | ||  \\| |                  '),  nl,       
+    write('           \\ V  V / | |_| || |\\  |                  '),     nl,    
+    write('            \\_/\\_/   \\___/ |_| \\_|                  \n\n').

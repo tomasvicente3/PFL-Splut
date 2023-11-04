@@ -1,6 +1,3 @@
-game_loop(GameState, _) :-
-    game_over(GameState), !.
-
 game_loop([Board, Turn, Steps], Player) :-
     step([Board, _, Steps], Player, NewBoard),
     NewTurn is Turn + 1,
@@ -8,7 +5,9 @@ game_loop([Board, Turn, Steps], Player) :-
     NewPlayer is 3 - Player,
     game_loop([NewBoard, NewTurn, NewSteps], NewPlayer).
 
+step(GameState,_,_) :- game_over(GameState), !.
 step([NewBoard, _, 0], _, NewBoard) :- !.
+
 step([Board, _, Steps], Player, NewBoard):-
     format("\nPlayer ~w's turn (~w steps left)\n", [Player, Steps]), nl,
     choose_move(Board, Player, Move),
@@ -38,24 +37,14 @@ move(Board, [Piece, [X,Y], Direction, emptySpace], NewBoard):-
 
 
 move(Board, [Piece, [X,Y], Direction, trollPull], NewBoard):-
-    %Mover a nossa piece
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
-
-    format("Original Board ~w\n", [Board]), nl,
     set_piece(Board, [Nx, Ny], Piece, TempBoard1),
-    format("Moved troll Board ~w\n", [TempBoard1]), nl,
-
-    %Colocar uma rocha na posição inicial da nossa piece
     set_piece(TempBoard1, [X,Y], 'R', TempBoard2),
-    format("Placed rock Board ~w\n", [TempBoard2]), nl,
-
-    %Apagar a rocha (opposite direction) da posição inicial da nossa piece
     opposing_direction(Direction, OppositeDirection),
     direction_map(OppositeDirection, [Dx2, Dy2]),
     Nx2 is X + Dx2, Ny2 is Y + Dy2,
-    set_piece(TempBoard2, [Nx2, Ny2], 0, NewBoard), !,
-    format("Removed rock Board ~w\n", [NewBoard]), nl.
+    set_piece(TempBoard2, [Nx2, Ny2], 0, NewBoard), !.
 
 move(Board, [Piece, [X,Y], Direction, trollThrow], NewBoard):-
     direction_map(Direction, [Dx, Dy]),
@@ -77,7 +66,7 @@ game_over([Board, _, _]):-
     congratulate(1).
 
 congratulate(Winner):-
-    format(" You win!\nCongratulations, Player ~w!",[Winner]), nl,
+    print_congratulations(Winner),
     write('Press any key to return to the main menu.\n'),
     get_char(_),
     menu(main).
