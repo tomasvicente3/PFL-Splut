@@ -1,44 +1,3 @@
-%belongs(+Player, +Piece)
-belongs(1, 'S').
-belongs(1, 'D').
-belongs(1, 'T').
-belongs(2, 's').
-belongs(2, 'd').
-belongs(2, 't').
-
-%direction_map(+Direction, -[Dx, Dy])
-direction_map('UP', [0, -1]).
-direction_map('DOWN', [0, 1]).
-direction_map('RIGHT', [1, 0]).
-direction_map('LEFT', [-1, 0]).
-
-%opposing_direction(?Direction1, ?Direction2)
-opposing_direction('UP', 'DOWN').
-opposing_direction('DOWN', 'UP').
-opposing_direction('RIGHT', 'LEFT').
-opposing_direction('LEFT', 'RIGHT').
-
-%piece_map(+Piece, -String)
-piece_map('S', 'Sorcerer').
-piece_map('D', 'Dwarf').
-piece_map('T', 'Troll').
-piece_map('s', 'Sorcerer').
-piece_map('d', 'Dwarf').
-piece_map('t', 'Troll').
-
-%column_map(+Column, -Index)
-column_map('A', 1).
-column_map('B', 2).
-column_map('C', 3).
-column_map('D', 4).
-column_map('E', 5).
-column_map('F', 6).
-column_map('G', 7).
-column_map('H', 8).
-column_map('I', 9).
-column_map('J', 10).
-column_map('K', 11).
-
 %in_bounds(+Board, +Position)
 in_bounds(Board, [X,Y]):-
     X > 0, Y > 0,
@@ -114,7 +73,7 @@ flying_rock(Board, [X,Y], Direction, NewBoard):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
     get_piece(Board, [Nx, Ny], NextPiece),
-    piece_map(NextPiece, PieceName), PieceName = 'Sorcerer', !,
+    piece_map(NextPiece, PieceType), PieceType = 'Sorcerer', !,
     set_piece(Board, [Nx,Ny], 'R', NewBoard).
 
 flying_rock(Board, [X,Y], Direction, NewBoard):-
@@ -147,7 +106,7 @@ get_moves(_ ,[], []).
 get_moves(Board, [[Piece, [X,Y]] | Rest], ListOfMoves):-
     %format("Piece: ~w, Position: ~w", [Piece, [X,Y]]), nl,
     Directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'],
-    findall([Piece, [X,Y], Direction], (member(Direction, Directions), piece_map(Piece, PieceName), can_move(PieceName, Board, [X, Y], Direction)), PieceMoves),
+    findall([Piece, [X,Y], Direction], (member(Direction, Directions), piece_map(Piece, PieceType), can_move(PieceType, Board, [X, Y], Direction)), PieceMoves),
     get_moves(Board, Rest, RestMoves),
     append(PieceMoves, RestMoves, ListOfMoves).
 
@@ -198,48 +157,8 @@ replace_at_row_aux([H | T], Index, Piece, CurrIdx, [H| NewT]):-
     NextIdx is CurrIdx + 1,
     replace_at_row_aux(T, Index, Piece, NextIdx, NewT).
 
-
-
 %initial_state(+Size, -GameState)
 initial_state(Size, [Board, Turns, Steps]):-
     Turns = 1,
     init_board(Size, Board), 
     min(Turns, 3, Steps), !.
-
-%init_board(+Size, -Board)
-init_board(7, [
-    [-1,   -1,   -1,   'R',    -1,   -1,   -1],
-    [-1,   -1,   't',  'd',   's',   -1,   -1],
-    [-1,    0,    0,    0,      0,    0,   -1],
-    ['R',   0,    0,    0,      0,    0,   'R'],
-    [-1,    0,    0,    0,      0,    0,   -1],
-    [-1,   -1,   'S',  'D',   'T',   -1,   -1],
-    [-1,   -1,   -1,   'R',    -1,   -1,   -1]
-]).
-
-
-init_board(9, [
-    [-1,   -1,   -1,    -1,    'R',   -1,   -1,   -1,   -1],
-    [-1,   -1,   -1,   't',    'd',   's',  -1,   -1,   -1],
-    [-1,   -1,    0,    0,      0,     0,    0,   -1,   -1],
-    [-1,    0,    0,    0,      0,     0,    0,    0,   -1],
-    ['R',   0,    0,    0,      0,     0,    0,    0,   'R'],
-    [-1,    0,    0,    0,      0,     0,    0,    0,   -1],
-    [-1,   -1,    0,    0,      0,     0,    0,   -1,   -1],
-    [-1,   -1,   -1,   'S',    'D',   'T',  -1,   -1,   -1],
-    [-1,   -1,   -1,   -1,     'R',   -1,   -1,   -1,   -1]
-]).
-
-init_board(11, [
-    [-1,   -1,   -1,   -1,     -1,    'R',  -1,   -1,   -1,   -1,   -1],
-    [-1,   -1,   -1,   -1,     't',   'd',  's',  -1,   -1,   -1,   -1],
-    [-1,   -1,   -1,    0,      0,     0,    0,    0,   -1,   -1,   -1],
-    [-1,   -1,    0,    0,      0,     0,    0,    0,    0,   -1,   -1],
-    [-1,    0,    0,    0,      0,     0,    0,    0,    0,    0,   -1],
-    ['R',   0,    0,    0,      0,     0,    0,    0,    0,    0,   'R'],
-    [-1,    0,    0,    0,      0,     0,    0,    0,    0,    0,   -1],
-    [-1,   -1,    0,    0,      0,     0,    0,    0,    0,    0,   -1],
-    [-1,   -1,   -1,    0,      0,     0,    0,    0,    0,    0,    0],
-    [-1,   -1,   -1,   -1,     'S',   'D',  'T',  -1,   -1,   -1,   -1],
-    [-1,   -1,   -1,   -1,     -1,    'R',   -1,  -1,   -1,   -1,   -1]
-]).

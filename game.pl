@@ -41,8 +41,8 @@ move(Board, [Piece, [X,Y], Direction], NewBoard):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
     get_piece(Board, [Nx, Ny], Ocupied),
-    piece_map(Piece, PieceName),
-    Ocupied = 'R', PieceName = 'Troll', !,
+    piece_map(Piece, PieceType),
+    Ocupied = 'R', PieceType = 'Troll', !,
     set_piece(Board, [X,Y], 0, TempBoard),
     set_piece(TempBoard, [Nx, Ny], Piece, TempBoard2),
     throw_rock(TempBoard2, [Nx, Ny], NewBoard), !.

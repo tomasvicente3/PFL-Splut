@@ -1,3 +1,4 @@
+:- consult('data.pl').
 :- consult('streamIO.pl').
 :- consult('utils.pl').
 :- consult('menu.pl').
