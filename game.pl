@@ -57,56 +57,6 @@ move(Board, [Piece, [X,Y], Direction, trollThrow], NewBoard):-
 move(Board, [Piece, [X,Y], Direction, dwarfPush], NewBoard):-
     shift_line(Board, [X,Y], Direction, NewBoard), !.
 
-shift_line(Board, [X, Y], Direction, NewBoard) :-
-    get_push_lenght(Board, [X, Y], Direction, Length),
-    shift_line_aux(Board, [X, Y], Direction, NewBoard, Length).
-
-shift_line_aux(Board, [X, Y], Direction, NewBoard, 0) :-
-    set_piece(Board, [X, Y], 0, NewBoard), !.
-
-shift_line_aux(Board, [X, Y], Direction, NewBoard, Length) :-
-    Length > 0,
-    direction_map(Direction, [Dx, Dy]),
-
-    multiply_direction(Direction, Length-1, [Dx2, Dy2]),
-    Nx is X + Dx2, Ny is Y + Dy2,
-    get_piece(Board, [Nx, Ny], Piece),
-
-    multiply_direction(Direction, Length, [Dx3, Dy3]),
-    Nx2 is X + Dx3, Ny2 is Y + Dy3,
-    set_piece(Board, [Nx2, Ny2], Piece, TempBoard),
-
-    NewLength is Length - 1,
-    shift_line_aux(TempBoard, [X, Y], Direction, NewBoard, NewLength).
-
-
-
-    
-get_push_lenght(Board, [X, Y], Direction, Length) :-
-    get_push_lenght_aux(Board, [X, Y], Direction, 1, Length).
-
-get_push_lenght_aux(Board, [X, Y], Direction, LengthSoFar, Length) :-
-    direction_map(Direction, [Dx, Dy]),
-    Nx is X + Dx,
-    Ny is Y + Dy,
-    get_piece(Board, [Nx, Ny], Piece),
-    Piece \= 0,
-    NewLength is LengthSoFar + 1,
-    get_push_lenght_aux(Board, [Nx, Ny], Direction, NewLength, Length).
-
-get_push_lenght_aux(Board, [X, Y], Direction, LengthSoFar, LengthSoFar) :-
-    direction_map(Direction, [Dx, Dy]),
-    Nx is X + Dx,
-    Ny is Y + Dy,
-    get_piece(Board, [Nx, Ny], Piece),
-    Piece = 0, !.
-
-
-multiply_direction(Direction, Length, [Dx, Dy]) :-
-    direction_map(Direction, [Dx1, Dy1]),
-    Dx is Dx1 * Length,
-    Dy is Dy1 * Length.
-
 game_over([Board, _, _]):-
     \+ get_position(Board, 'S', _), !,
     congratulate(2).
@@ -119,4 +69,3 @@ congratulate(Winner):-
     write('Press any key to return to the main menu.\n'),
     get_char(_),
     menu(main).
-

@@ -34,6 +34,7 @@ print_rules:-
 
 %--------------GAME--------------
 display_game(Board) :-
+    clear_screen,
     length(Board, Length),
     display_header(Length),
     display_bar(Length),
