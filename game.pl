@@ -29,6 +29,7 @@ step(GameState, Player, NewBoard):-
 %choose_move(+Board, +Player, -Move)
 %Gets the list of valid moves, displays them and asks the player to choose one
 choose_move(Board, Player, Move):-
+    human(Player), !,
     valid_moves([Board,_, _], Player, ListOfMoves),
     length(ListOfMoves, Length),
     Length > 0, !,
@@ -37,6 +38,19 @@ choose_move(Board, Player, Move):-
     display_moves(ListOfMoves, Length, 1),
 
     read_option(1, Length, Option),
+    nth1(Option, ListOfMoves, Move).
+
+choose_move(Board, Player, Move):-
+    computer(Player, DificultyLevel), !,
+    choose_move(Board, Player, DificultyLevel, Move).
+
+%choose_move(+Board, +Player, +DificultyLevel, -Move)
+%Given that the player is a computer, chooses a move based on the dificulty level
+choose_move(Board, Player, 1, Move):- !,
+    valid_moves([Board,_, _], Player, ListOfMoves),
+    length(ListOfMoves, Length),
+    Length > 0, !,
+    random(1, Length, Option),
     nth1(Option, ListOfMoves, Move).
 
 %move(+GameState, +Move, -NewGameState)
