@@ -26,19 +26,6 @@ piece_map('s', 'Sorcerer').
 piece_map('d', 'Dwarf').
 piece_map('t', 'Troll').
 
-%column_map(+Column, -Index)
-column_map('A', 1).
-column_map('B', 2).
-column_map('C', 3).
-column_map('D', 4).
-column_map('E', 5).
-column_map('F', 6).
-column_map('G', 7).
-column_map('H', 8).
-column_map('I', 9).
-column_map('J', 10).
-column_map('K', 11).
-
 %can_be_thrown_through(+Piece)
 can_be_thrown_through(0).
 can_be_thrown_through('D').

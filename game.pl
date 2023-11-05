@@ -8,10 +8,11 @@ game_loop([Board, Turn, Steps], Player) :-
 step(GameState,_,_) :- game_over(GameState), !.
 step([NewBoard, _, 0], _, NewBoard) :- !.
 
-step([Board, _, Steps], Player, NewBoard):-
+step(GameState, Player, NewBoard):-
+    [Board, _, Steps] = GameState,
     format("\nPlayer ~w's turn (~w steps left)\n", [Player, Steps]), nl,
     choose_move(Board, Player, Move),
-    move(Board, Move, AccBoard),
+    move(GameState, Move, AccBoard),
     display_game(AccBoard),
     NewSteps is Steps - 1,
     step([AccBoard, _, NewSteps], Player, NewBoard).
@@ -27,7 +28,8 @@ choose_move(Board, Player, Move):-
     read_option(1, Length, Option),
     nth1(Option, ListOfMoves, Move).
 
-move(Board, [Piece, [X,Y], Direction, emptySpace], NewBoard):-
+%When a dwarf/troll is going to an empty space
+move([Board, _ ,_], [Piece, [X,Y], Direction, emptySpace], NewBoard):-
     piece_map(Piece, PieceType),
     PieceType \= 'Sorcerer', !,
     direction_map(Direction, [Dx, Dy]),
@@ -36,7 +38,7 @@ move(Board, [Piece, [X,Y], Direction, emptySpace], NewBoard):-
     set_piece(TempBoard, [Nx, Ny], Piece, NewBoard), !.
 
 %When its a sorcerer going to an empty space
-move(Board, [Piece, [X,Y], Direction, emptySpace], NewBoard):-
+move([Board, _ ,_], [Piece, [X,Y], Direction, emptySpace], NewBoard):-
     piece_map(Piece, PieceType),
     PieceType = 'Sorcerer', !,
     direction_map(Direction, [Dx, Dy]),
@@ -45,7 +47,8 @@ move(Board, [Piece, [X,Y], Direction, emptySpace], NewBoard):-
     set_piece(TempBoard, [Nx, Ny], Piece, TempBoard2),
     levitate_rock(TempBoard2, Direction, NewBoard), !.
 
-move(Board, [Piece, [X,Y], Direction, trollPull], NewBoard):-
+
+move([Board, _ ,_], [Piece, [X,Y], Direction, trollPull], NewBoard):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
     set_piece(Board, [Nx, Ny], Piece, TempBoard1),
@@ -55,7 +58,7 @@ move(Board, [Piece, [X,Y], Direction, trollPull], NewBoard):-
     Nx2 is X + Dx2, Ny2 is Y + Dy2,
     set_piece(TempBoard2, [Nx2, Ny2], 0, NewBoard), !.
 
-move(Board, [Piece, [X,Y], Direction, trollThrow], NewBoard):-
+move([Board, _ ,_], [Piece, [X,Y], Direction, trollThrow], NewBoard):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
     get_piece(Board, [Nx, Ny], Ocupied),
@@ -64,7 +67,7 @@ move(Board, [Piece, [X,Y], Direction, trollThrow], NewBoard):-
     set_piece(TempBoard, [Nx, Ny], Piece, TempBoard2),
     throw_rock(TempBoard2, [Nx, Ny], NewBoard), !.
 
-move(Board, [Piece, [X,Y], Direction, dwarfPush], NewBoard):-
+move([Board, _ ,_], [Piece, [X,Y], Direction, dwarfPush], NewBoard):-
     shift_line(Board, [X,Y], Direction, NewBoard), !.
 
 game_over([Board, _, _]):-
