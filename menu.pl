@@ -28,7 +28,7 @@ option(main_menu, 2):-
     get_char(_),!,
     menu(main).
 
-option(main_menu, 3).
+option(main_menu, 3) :- halt.
 
 menu(board_size, Size) :-
     repeat,

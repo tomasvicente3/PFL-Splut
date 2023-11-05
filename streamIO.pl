@@ -8,7 +8,6 @@ read_option(Min, Max, Option) :-
     (between(Min, Max, Option) ->  true ; write('Invalid option! Try again: '), fail).
 
 %--------------MENU--------------
-
 print_logo :-
     write('  ____    ____    _       _   _   _____ '), nl,
     write(' / ___|  |  _ \\  | |     | | | | |_   _|'), nl,
@@ -35,7 +34,6 @@ print_rules:-
 
 %--------------GAME--------------
 display_game(Board) :-
-    print_logo,
     length(Board, Length),
     display_header(Length),
     display_bar(Length),
