@@ -54,7 +54,7 @@ choose_move(Board, Player, 1, Move):- !,
     valid_moves([Board,_, _], Player, ListOfMoves),
     length(ListOfMoves, Length),
     Length > 0, !,
-    random(1, Length, Option),
+    custom_random(1, Length, Option),
     nth1(Option, ListOfMoves, Move).
 
 %move(+GameState, +Move, -NewGameState)
@@ -75,7 +75,8 @@ move([Board, _ ,_], [Piece, [X,Y], Direction, emptySpace], NewBoard):-
     Nx is X + Dx, Ny is Y + Dy,
     set_piece(Board, [X,Y], 0, TempBoard),
     set_piece(TempBoard, [Nx, Ny], Piece, TempBoard2),
-    levitate_rock(TempBoard2, Direction, NewBoard), !.
+    belongs(Player, Piece),
+    levitate_rock(TempBoard2, Direction, Player, NewBoard), !.
 
 %Uppon a trollPull, move the troll and the rock behind him
 move([Board, _ ,_], [Piece, [X,Y], Direction, trollPull], NewBoard):-
@@ -94,7 +95,8 @@ move([Board, _ ,_], [Piece, [X,Y], Direction, trollThrow], NewBoard):-
     Nx is X + Dx, Ny is Y + Dy,
     set_piece(Board, [X,Y], 0, TempBoard),
     set_piece(TempBoard, [Nx, Ny], Piece, TempBoard2),
-    throw_rock(TempBoard2, [Nx, Ny], NewBoard), !.
+    belongs(Player, Piece),
+    throw_rock(TempBoard2, Player, [Nx, Ny], NewBoard), !.
 
 %Uppon a dwarfPush, move the dwarf and pieces in front one space in a given direction
 move([Board, _ ,_], [_, [X,Y], Direction, dwarfPush], NewBoard):-

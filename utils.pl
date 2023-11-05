@@ -20,3 +20,9 @@ read_number_aux(X,X).
 read_char(Char) :-
     get_code(Code),
     char_code(Char, Code).
+
+%custom_random(+Lower, +Higher, -Random)
+%Generates a random number between Lower and Higher and takes care of the edge case Lower = Higher
+custom_random(Lower, Higher, Random):-
+    Higher1 is Higher + 1,
+    random(Lower, Higher1, Random).
