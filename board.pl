@@ -281,3 +281,35 @@ levitate_rock(Board, Direction, Player, NewBoard) :-
     ).
 
 levitate_rock(Board, _, _, Board).
+
+%value(+GameState, +Player, -Value)
+%Evaluates the board in terms of favorable positions for the player
+value([Board, _, _], Player, Value):-
+    get_positions(Board, ['R'], Positions),
+    
+    get_troll_pos(Board, Player, TrollPosition),
+
+    get_enemy_sorcerer_pos(Board,Player, EnemySorcererPosition),
+    
+    get_pos_distances(Positions, TrollPosition, RockPosDistances),
+    get_min_from_pos_dist(RockPosDistances, ClosestRockPos, ClosestRockDistance),
+    get_distances([ClosestRockPos], EnemySorcererPosition, SorcererDistances),
+    nth1(1, SorcererDistances, RockToSorcererDist),
+    Value is ClosestRockDistance+RockToSorcererDist.
+
+%get_troll_pos(+Board, +Player, -TrollPosition)
+%Gets the position of the player's troll
+get_troll_pos(Board, Player, TrollPosition):-
+    piece_map(Piece, 'Troll'),
+    belongs(Player, Piece),
+    get_positions(Board, [Piece], TrollPositionList),
+    nth1(1, TrollPositionList, TrollPosition).
+
+%get_enemy_sorcerer_pos(+Board, +Player, -EnemySorcererPosition)
+%Gets the position of the enemy sorcerer
+get_enemy_sorcerer_pos(Board, Player, EnemySorcererPosition):-
+    Enemy is 3 - Player,
+    piece_map(EnemyS, 'Sorcerer'),
+    belongs(Enemy, EnemyS),
+    get_positions(Board, [EnemyS], EnemySorcererPositionList),
+    nth1(1, EnemySorcererPositionList, EnemySorcererPosition).
