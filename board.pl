@@ -238,27 +238,25 @@ get_rock_positions(Board, Positions) :-
     findall([X,Y], (nth1(Y, Board, Row), nth1(X, Row, 'R')), Positions).
 
 
-%What happens when ChosenRock is 0?
 levitate_rock(Board, Direction, NewBoard) :-
     direction_map(Direction, [Dx, Dy]),
-    
-    %1st get positions of rock
     get_rock_positions(Board, Positions),
-    
-    %2nd find all the positions whose position+direction is empty
     findall([X, Y], (member([X, Y], Positions), X2 is X + Dx, Y2 is Y + Dy, get_piece(Board, [X2, Y2], Piece), Piece = 0), LevitatingRocks),
     length(LevitatingRocks, Length),
-    
     Length > 0, !,
-
-    %3rd ask the user to choose one of the levitating rocks
-    write('Choose a rock to levitate: \n'),
-    choose_levitating_rock(LevitatingRocks, ChosenRockIndex),
-    
-    %4th if different from 0, move rock from position to position+direction (put piece 0 in position and piece 'R' in position+direction)
-    nth1(ChosenRockIndex, LevitatingRocks, [RX, RY]),
-    set_piece(Board, [RX, RY], 0, TempBoard),
-    NX is RX + Dx, NY is RY + Dy,
-    set_piece(TempBoard, [NX, NY], 'R', NewBoard).
+    write('Do you want to levitate a rock? \n'),
+    write('1. Yes \n'),
+    write('2. No \n'),
+    read_option(1, 2, UserResponse),
+    (UserResponse = 1 ->
+        write('Choose a rock to levitate: \n'),
+        choose_levitating_rock(LevitatingRocks, ChosenRockIndex),
+        nth1(ChosenRockIndex, LevitatingRocks, [RX, RY]),
+        set_piece(Board, [RX, RY], 0, TempBoard),
+        NX is RX + Dx, NY is RY + Dy,
+        set_piece(TempBoard, [NX, NY], 'R', NewBoard)
+    ; 
+        NewBoard = Board
+    ).
 
 levitate_rock(Board, _, Board).

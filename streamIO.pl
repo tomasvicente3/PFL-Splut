@@ -47,8 +47,7 @@ display_header(Length):-
 display_header_aux(Length, Index) :- Index > Length, !, write('|\n').
 display_header_aux(Length, Index) :-
     write('| '),
-    get_index_letter(Index, Letter),
-    write(Letter),
+    write(Index),
     write(' '),
     I1 is Index + 1,
     display_header_aux(Length, I1).
@@ -155,7 +154,7 @@ choose_levitating_rock(LevitatingRocks, ChosenRockIndex) :-
     length(LevitatingRocks, Length),
     display_levitating_rocks(LevitatingRocks, Length, 1),
     read_option(1, Length, ChosenRockIndex).
-    
+
 print_congratulations(1) :-
     write('  ____   _         _  __   __ _____  ____      _ '), nl,
     write(' |  _ \\ | |       / \\ \\ \\ / /| ____||  _ \\    / |'), nl,

@@ -39,25 +39,10 @@ column_map('I', 9).
 column_map('J', 10).
 column_map('K', 11).
 
-%get_index_letter(+Index, -Letter)
-get_index_letter(1, 'A').
-get_index_letter(2, 'B').
-get_index_letter(3, 'C').
-get_index_letter(4, 'D').
-get_index_letter(5, 'E').
-get_index_letter(6, 'F').
-get_index_letter(7, 'G').
-get_index_letter(8, 'H').
-get_index_letter(9, 'I').
-get_index_letter(10, 'J').
-get_index_letter(11, 'K').
-
 %can_be_thrown_through(+Piece)
 can_be_thrown_through(0).
 can_be_thrown_through('D').
 can_be_thrown_through('d').
-
-
 
 %stops_rock(+Piece)
 stops_rock(-1).
