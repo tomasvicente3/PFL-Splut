@@ -14,13 +14,9 @@ print_options(main_menu) :-
 option(main_menu, 1) :-
     menu(board_size, Size),
     menu(game_mode),
-
     initial_state(Size, GameState),
-    clear_screen,
-
     [Board, _, _] = GameState,
     display_game(Board), !,
-
     game_loop(GameState, 1).
 
 option(main_menu, 2):-
@@ -32,7 +28,7 @@ option(main_menu, 2):-
     get_char(_),!,
     menu(main).
 
-option(main_menu, 3).
+option(main_menu, 3) :- halt.
 
 menu(board_size, Size) :-
     repeat,
@@ -50,8 +46,10 @@ print_options(board_size) :-
 
 option(board_size, 1, Size) :-
     Size = 7.
+
 option(board_size, 2, Size) :-
     Size = 9.
+
 option(board_size, 3, Size) :-
     Size = 11.
 
