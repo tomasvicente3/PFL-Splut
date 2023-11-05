@@ -62,3 +62,59 @@ Quando o Sorcerer se move, pode escolher levitar uma pedra qualquer na mesma dir
 
 ###    Fontes
 As regras e o funcionamento do jogo foram consultadas nas páginas [IgGameCenter](https://www.iggamecenter.com/en/rules/splut) e [BoardGameGeek](https://boardgamegeek.com/boardgame/64735/splut/images).
+
+## Lógica do Jogo
+
+### Representação interna do estado de jogo
+
+O estado de jogo, *GameState* é representado por uma lista de três elementos:
+
+* **Board** - Matriz quadrada que representa o tabuleiro. Esta matriz é composta por diferentes elementos que simbolizam as peças do jogo. As peças pertencentes ao jogador um são representadas por letras maiúsculas, enquanto as peças do jogador dois são representadas por letras minúsculas. A letra "R" representa uma rocha, "T" ou "t" representam um StoneTroll, "D" ou "d" representam um Dwarf, e "S" ou "s" representam um Sorcerer. Além disso, devido ao formato de losango do nosso tabuleiro, os números -1 e -2 são usados para representar os limites do mesmo, sendo ambos tratados da mesma forma na lógica do jogo. O número -2 é particularmente útil na exibição do tabuleiro.
+
+* **Turn** - Turno atual do jogo, é incrementado sempre que ocorre a mudança de jogador.
+
+* **Steps** - Indica o número de jogadas restantes disponíveis para o jogador.
+
+#### Exemplos de representação do GameState:
+
+*   Estado Inicial
+
+No início do jogo, as quatro pedras encontram-se dispostas nas extremidades do tabuleiro e as peças dos jogadores estão situadas em lados opostos. O jogo tem início com o primeiro turno, onde o primeiro jogador tem disponível um único movimento.
+
+
+```prolog=
+[[-1,   -1,   -1,   'R',    -2,   -1,    -1],
+ [-1,   -1,   't',  'd',   's',   -2,    -1],
+ [-1,    0,    0,    0,      0,    0,    -2],
+ ['R',   0,    0,    0,      0,    0,   'R'],
+ [-1,    0,    0,    0,      0,    0,    -2],
+ [-1,   -1,   'S',  'D',   'T',   -2,    -1],
+ [-1,   -1,   -1,   'R',    -2,   -1,    -1], 1, 1]
+```
+
+*   Estado Intermédio
+
+```prolog=
+[[-1,   -1,   -1,  'R',  -2,   -1,   -1],
+ [-1,   -1,    0,  't',   0,   -2,   -1],
+ [-1,    0,    0,   0,   's',   0,   -2],
+ ['R',   0,   'd', 'S',   0,    0,   'R'],
+ [-1,    0,    0,  'T',   0,    0,   -2],
+ [-1,   -1,    0,  'D',   0,   -2,   -1],
+ [-1,   -1,   -1,  'R',  -2,   -1,   -1], 12, 3]
+```
+
+*   Estado Final
+
+No Splut! não é possível a ocorrência de empates pelo que o estado final só é atingido quando uma das pedras atinge o "Sorcerer" do jogador adversário. No seguinte exemplo o jogador dois foi o vencedor.
+
+
+```prolog=
+[[-1,   -1,   -1,  't',  -2,   -1,   -1],
+ [-1,   -1,    0,   0,   0,   -2,   -1],
+ [-1,    0,    0,   0,   's',   0,   -2],
+ ['R',   0,   'd', 'R',   0,    0,   'R'],
+ [-1,    0,    0,  'T',   0,    0,   -2],
+ [-1,   -1,    0,  'D',   0,   -2,   -1],
+ [-1,   -1,   -1,  'R',  -2,   -1,   -1], 13, 3]
+```
