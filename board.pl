@@ -173,13 +173,12 @@ shift_line(Board, [X, Y], Direction, NewBoard) :-
 
 %shift_line_aux(+Board, +Position, +Direction, -NewBoard, +Length)
 %Base case, we shifted all the pieces (Put the 0 in the initial position)
-shift_line_aux(Board, [X, Y], Direction, NewBoard, 0) :-
+shift_line_aux(Board, [X, Y], _, NewBoard, 0) :-
     set_piece(Board, [X, Y], 0, NewBoard), !.
 
 %We shift the front piece one space (Initial pos + direction*(length-1) -> (Initial pos + direction*length)
 shift_line_aux(Board, [X, Y], Direction, NewBoard, Length) :-
     Length > 0,
-    direction_map(Direction, [Dx, Dy]),
 
     multiply_direction(Direction, Length-1, [Dx2, Dy2]),
     Nx is X + Dx2, Ny is Y + Dy2,

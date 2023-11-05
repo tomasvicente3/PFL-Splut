@@ -88,14 +88,12 @@ move([Board, _ ,_], [Piece, [X,Y], Direction, trollPull], NewBoard):-
 move([Board, _ ,_], [Piece, [X,Y], Direction, trollThrow], NewBoard):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
-    get_piece(Board, [Nx, Ny], Ocupied),
-    piece_map(Piece, PieceType),
     set_piece(Board, [X,Y], 0, TempBoard),
     set_piece(TempBoard, [Nx, Ny], Piece, TempBoard2),
     throw_rock(TempBoard2, [Nx, Ny], NewBoard), !.
 
 %Uppon a dwarfPush, move the dwarf and pieces in front one space in a given direction
-move([Board, _ ,_], [Piece, [X,Y], Direction, dwarfPush], NewBoard):-
+move([Board, _ ,_], [_, [X,Y], Direction, dwarfPush], NewBoard):-
     shift_line(Board, [X,Y], Direction, NewBoard), !.
 
 %game_over(+GameState)
