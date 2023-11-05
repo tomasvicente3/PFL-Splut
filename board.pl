@@ -74,7 +74,6 @@ valid_moves([Board,_, _], Player, ListOfMoves):-
 %get_moves(+Board, +PlayerPieces, -ListOfMoves)
 get_moves(_ ,[], []).
 get_moves(Board, [[Piece, [X,Y]] | Rest], ListOfMoves):-
-    %format("Piece: ~w, Position: ~w", [Piece, [X,Y]]), nl,
     Directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'],
     findall([Piece, [X,Y], Direction, MoveType], (member(Direction, Directions), piece_map(Piece, PieceType), can_move(PieceType, Board, [X, Y], Direction, MoveType)), PieceMoves),
     get_moves(Board, Rest, RestMoves),
