@@ -25,7 +25,7 @@ can_move('Troll', Board, [X, Y], Direction, trollPull) :-
     get_piece(Board, [Ox, Oy], Ocupied2),
     Ocupied2 = 'R'.
 
-%A troll can move to a location and throw a rock as long as it can be thrown
+%A troll can move to a place where previously there was a rock and throw it
 can_move('Troll', Board, [X, Y], Direction, trollThrow) :-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx,
@@ -36,7 +36,7 @@ can_move('Troll', Board, [X, Y], Direction, trollThrow) :-
 
     can_throw_rock(NewBoard, [Nx, Ny]).
 
-%A dwarf can move to an occupied space as long as it can shift every piece in front
+%A dwarf can move to an occupied space as long as it can shift every piece in front one space in the same direction
 can_move('Dwarf', Board, [X, Y], Direction, dwarfPush) :-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx,
@@ -45,20 +45,21 @@ can_move('Dwarf', Board, [X, Y], Direction, dwarfPush) :-
     Ocupied \= 0,
     can_push(Board, [Nx, Ny], Direction).
 
-%Check if a rock can be thrown from a position
+%can_throw_rock(+Board, +Position)
 can_throw_rock(Board, [X, Y]):-
     Directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'],
     findall(Direction, (member(Direction, Directions), can_throw(Board, [X,Y], Direction)), ListOfDirections),!,
     length(ListOfDirections, Length),
     Length > 0.
 
-%Check if we can shift every piece in a certain direction starting from a position
+%can_be_thrown_through(+Board, +Position, +Direction)
+%We can push a piece as long as eventually we find an empty space
 can_push(Board, [X, Y], Direction):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx,
     Ny is Y + Dy,
     get_piece(Board, [Nx, Ny], Ocupied), !,
-    (Ocupied = 0; can_move('Dwarf', Board, [Nx,Ny], Direction, _)), !.
+    (Ocupied = 0; can_push(Board, [Nx,Ny], Direction)), !.
 
 %valid_moves(+GameState, +Player, -ListOfMoves)
 valid_moves([Board,_, _], Player, ListOfMoves):-
@@ -66,9 +67,11 @@ valid_moves([Board,_, _], Player, ListOfMoves):-
     get_positions(Board, PlayerPieces, PiecesPosition),
     get_moves(Board, PlayerPieces, PiecesPosition, ListOfMoves).
 
+%get_positions(+Board, +PiecesList, -PiecesPosition)
 get_positions(Board, PiecesList, PiecesPosition):-
     findall([X, Y], (member(Piece, PiecesList), nth1(Y, Board, Row), nth1(X, Row, Piece)), PiecesPosition).
 
+%get_moves(+Board, +PiecesList, +PiecesPosition, -ListOfMoves)
 get_moves(_, [], _, []).
 get_moves(Board, [Piece | RestPieces], [[X, Y] | RestPositions], ListOfMoves):-
     Directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'],
@@ -89,6 +92,8 @@ get_piece(Board, [X, Y], Ocupied):-
 set_piece(Board, [X,Y], Piece, NewBoard):-
     set_piece_aux(Board, [X,Y], Piece, 1, NewBoard).
 
+%set_piece_aux(+Board, +Position, +Piece, +CurrY, -NewBoard)
+%Base case, we got to the correct column
 set_piece_aux([Row | Rest], [X, Y], Piece, Y, [NewRow | Rest]):-
     replace_at_row(Row, X, Piece, NewRow), !.
 set_piece_aux([Row | Rest], [X, Y], Piece, CurrY, [Row | NewRest]):-
@@ -160,13 +165,18 @@ flying_rock(Board, [X,Y], Direction, NewBoard):-
     \+ stops_rock(NextPiece), in_bounds(Board, [Nx,Ny]), !,
     flying_rock(Board, [Nx, Ny], Direction, NewBoard).
 
+%shift_piece(+Board, +Position, +Direction, -NewBoard)
+%We get the lenght(number of pieces we need to shift) and then we shift the line
 shift_line(Board, [X, Y], Direction, NewBoard) :-
     get_push_lenght(Board, [X, Y], Direction, Length),
     shift_line_aux(Board, [X, Y], Direction, NewBoard, Length).
 
+%shift_line_aux(+Board, +Position, +Direction, -NewBoard, +Length)
+%Base case, we shifted all the pieces (Put the 0 in the initial position)
 shift_line_aux(Board, [X, Y], Direction, NewBoard, 0) :-
     set_piece(Board, [X, Y], 0, NewBoard), !.
 
+%We shift the front piece one space (Initial pos + direction*(length-1) -> (Initial pos + direction*length)
 shift_line_aux(Board, [X, Y], Direction, NewBoard, Length) :-
     Length > 0,
     direction_map(Direction, [Dx, Dy]),
@@ -181,10 +191,13 @@ shift_line_aux(Board, [X, Y], Direction, NewBoard, Length) :-
 
     NewLength is Length - 1,
     shift_line_aux(TempBoard, [X, Y], Direction, NewBoard, NewLength).
-    
+
+%get_push_lenght(+Board, +Position, +Direction, -Length)
+%Calls the aux predicate with the initial length = 1
 get_push_lenght(Board, [X, Y], Direction, Length) :-
     get_push_lenght_aux(Board, [X, Y], Direction, 1, Length).
 
+%While we haven't found an empty space, we increase the length and recursevly call the predicate
 get_push_lenght_aux(Board, [X, Y], Direction, LengthSoFar, Length) :-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx,
@@ -194,6 +207,7 @@ get_push_lenght_aux(Board, [X, Y], Direction, LengthSoFar, Length) :-
     NewLength is LengthSoFar + 1,
     get_push_lenght_aux(Board, [Nx, Ny], Direction, NewLength, Length).
 
+%Base case, If we found an empty space, we stop and return the length
 get_push_lenght_aux(Board, [X, Y], Direction, LengthSoFar, LengthSoFar) :-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx,
@@ -201,11 +215,14 @@ get_push_lenght_aux(Board, [X, Y], Direction, LengthSoFar, LengthSoFar) :-
     get_piece(Board, [Nx, Ny], Piece),
     Piece = 0, !.
 
+%multiply_direction(+Direction, +Length, -MultipliedDirection)
 multiply_direction(Direction, Length, [Dx, Dy]) :-
     direction_map(Direction, [Dx1, Dy1]),
     Dx is Dx1 * Length,
     Dy is Dy1 * Length.
 
+%levitate_rock(+Board, +Direction, -NewBoard)
+%A rock can be levitated if there is an empty space walking in the direction of the sorcerer
 levitate_rock(Board, Direction, NewBoard) :-
     direction_map(Direction, [Dx, Dy]),
     get_positions(Board, ['R'], Positions),
