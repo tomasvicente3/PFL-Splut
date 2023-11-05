@@ -63,46 +63,20 @@ can_push(Board, [X, Y], Direction):-
 %valid_moves(+GameState, +Player, -ListOfMoves)
 valid_moves([Board,_, _], Player, ListOfMoves):-
     findall(Piece, belongs(Player, Piece), PlayerPieces),
-    get_player_pieces_info(Board, PlayerPieces, PlayerPiecesInfo),
-    get_moves(Board, PlayerPiecesInfo, ListOfMoves).
+    get_positions(Board, PlayerPieces, PiecesPosition),
+    get_moves(Board, PlayerPieces, PiecesPosition, ListOfMoves).
 
-%get_moves(+Board, +PlayerPieces, -ListOfMoves)
-get_moves(_ ,[], []).
-get_moves(Board, [[Piece, [X,Y]] | Rest], ListOfMoves):-
+get_positions(Board, PiecesList, PiecesPosition):-
+    findall([X, Y], (member(Piece, PiecesList), nth1(Y, Board, Row), nth1(X, Row, Piece)), PiecesPosition).
+
+get_moves(_, [], _, []).
+get_moves(Board, [Piece | RestPieces], [[X, Y] | RestPositions], ListOfMoves):-
     Directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'],
-    findall([Piece, [X,Y], Direction, MoveType], (member(Direction, Directions), piece_map(Piece, PieceType), can_move(PieceType, Board, [X, Y], Direction, MoveType)), PieceMoves),
-    get_moves(Board, Rest, RestMoves),
+    findall([Piece, [X,Y], Direction, MoveType], 
+            (member(Direction, Directions), piece_map(Piece, PieceType), can_move(PieceType, Board, [X, Y], Direction, MoveType)), 
+            PieceMoves),
+    get_moves(Board, RestPieces, RestPositions, RestMoves),
     append(PieceMoves, RestMoves, ListOfMoves).
-
-%get_player_pieces_info(+Board, +PlayerPieces, -PlayerPiecesInfo)
-%Obtains a list of pieces and their positions
-get_player_pieces_info(_, [], []).
-get_player_pieces_info(Board, [Piece | Rest], [[Piece, Position] | RestInfo]):-
-    get_position(Board, Piece, Position),
-    get_player_pieces_info(Board, Rest, RestInfo).
-get_player_pieces_info(Board, [Piece | Rest], RestInfo):-
-    \+ get_position(Board, Piece, _),
-    get_player_pieces_info(Board, Rest, RestInfo).
-
-
-%get_position(+Board, +Piece, -Position)
-get_position(Board, Piece, [X, Y]):-
-    get_position_aux(Board, Piece, [_, 1], [X, Y]).
-
-get_position_aux([], _, _, _):- !, fail.
-get_position_aux([Row | _], Piece, [_, RowAcc], [X, Y]):-
-    check_row(Row, Piece, 1, X),
-    Y = RowAcc, !.
-get_position_aux([_ | Rest], Piece, [_, RowAcc], [X, Y]):-
-    NewRowAcc is RowAcc + 1,
-    get_position_aux(Rest, Piece, [1, NewRowAcc], [X, Y]).
-
-%check_row(+Row, +Piece, +ColAcc, -X)
-check_row([], _, _, _):- !, fail.
-check_row([Piece | _], Piece, ColAcc, ColAcc).
-check_row([_ | Rest], Piece, ColAcc, X):-
-    NewColAcc is ColAcc + 1,
-    check_row(Rest, Piece, NewColAcc, X).
 
 %get_piece(+Board, +Position, -Ocupied)
 get_piece(Board, [X, Y], Ocupied):-
@@ -227,19 +201,15 @@ get_push_lenght_aux(Board, [X, Y], Direction, LengthSoFar, LengthSoFar) :-
     get_piece(Board, [Nx, Ny], Piece),
     Piece = 0, !.
 
-
 multiply_direction(Direction, Length, [Dx, Dy]) :-
     direction_map(Direction, [Dx1, Dy1]),
     Dx is Dx1 * Length,
     Dy is Dy1 * Length.
 
-% get_positions(+Board, +Piece, -Positions)
-get_rock_positions(Board, Positions) :-
-    findall([X,Y], (nth1(Y, Board, Row), nth1(X, Row, 'R')), Positions).
-
-
 levitate_rock(Board, Direction, NewBoard) :-
     direction_map(Direction, [Dx, Dy]),
+    get_positions(Board, ['R'], Positions),
+
     get_rock_positions(Board, Positions),
     findall([X, Y], (member([X, Y], Positions), X2 is X + Dx, Y2 is Y + Dy, get_piece(Board, [X2, Y2], Piece), Piece = 0), LevitatingRocks),
     length(LevitatingRocks, Length),

@@ -68,10 +68,12 @@ move(Board, [Piece, [X,Y], Direction, dwarfPush], NewBoard):-
     shift_line(Board, [X,Y], Direction, NewBoard), !.
 
 game_over([Board, _, _]):-
-    \+ get_position(Board, 'S', _), !,
+    get_positions(Board, ['S'], Positions),
+    Positions = [], !,
     congratulate(2).
 game_over([Board, _, _]):-
-    \+ get_position(Board, 's', _), !,
+    get_positions(Board, ['s'], Positions),
+    Positions = [], !,
     congratulate(1).
 
 congratulate(Winner):-
