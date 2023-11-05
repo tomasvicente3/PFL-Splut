@@ -1,3 +1,7 @@
+%game_loop(+GameState, +Player)
+
+
+%Calls the step function, increments turn, resets steps and changes player
 game_loop([Board, Turn, Steps], Player) :-
     step([Board, _, Steps], Player, NewBoard),
     NewTurn is Turn + 1,

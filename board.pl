@@ -210,7 +210,6 @@ levitate_rock(Board, Direction, NewBoard) :-
     direction_map(Direction, [Dx, Dy]),
     get_positions(Board, ['R'], Positions),
 
-    get_rock_positions(Board, Positions),
     findall([X, Y], (member([X, Y], Positions), X2 is X + Dx, Y2 is Y + Dy, get_piece(Board, [X2, Y2], Piece), Piece = 0), LevitatingRocks),
     length(LevitatingRocks, Length),
     Length > 0, !,

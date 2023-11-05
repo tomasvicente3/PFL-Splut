@@ -1,10 +1,12 @@
 %min(+A, +B, -Min)
+%Returns the minimum of A and B
 min(A, B, Min):-
     A > B,
     Min = B.
 min(A, _, A).
 
 % read_number(-Number)
+% Reads a number from the input using get_code
 read_number(X):-
     read_number_aux(X,0).
 read_number_aux(X,Acc):- 
@@ -18,8 +20,3 @@ read_number_aux(X,X).
 read_char(Char) :-
     get_code(Code),
     char_code(Char, Code).
-
-writeArray([]).
-writeArray([H|T]):-
-    write(H), nl,
-    writeArray(T).
