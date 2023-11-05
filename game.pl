@@ -2,7 +2,7 @@
 
 %Calls the step function, increments turn, resets steps and changes player
 game_loop([Board, Turn, Steps], Player) :-
-    step([Board, _, Steps], Player, NewBoard),
+    step([Board, Turn, Steps], Player, NewBoard),
     NewTurn is Turn + 1,
     min(NewTurn, 3, NewSteps),
     NewPlayer is 3 - Player,
@@ -16,15 +16,18 @@ step(GameState,_,_) :- game_over(GameState), !.
 %If the player has no steps left, end turn
 step([NewBoard, _, 0], _, NewBoard) :- !.
 
+%If a rock was thrown, end_turn(Turn) is true
+step([_, Turn, _], _, NewBoard) :- end_turn(Turn), !,  format("Going to end turn ~w\n", [Turn]), !.
+
 %If the player has steps left, the player chooses the move, the move is made and the game is displayed
 step(GameState, Player, NewBoard):-
-    [Board, _, Steps] = GameState,
+    [Board, Turn, Steps] = GameState,
     format("\nPlayer ~w's turn (~w steps left)\n", [Player, Steps]), nl,
     choose_move(Board, Player, Move),
     move(GameState, Move, AccBoard),
     display_game(AccBoard),
     NewSteps is Steps - 1,
-    step([AccBoard, _, NewSteps], Player, NewBoard).
+    step([AccBoard, Turn, NewSteps], Player, NewBoard).
 
 %choose_move(+Board, +Player, -Move)
 %Gets the list of valid moves, displays them and asks the player to choose one
@@ -71,14 +74,15 @@ move([Board, _ ,_], [Piece, [X,Y], Direction, trollPull], NewBoard):-
     set_piece(TempBoard2, [Nx2, Ny2], 0, NewBoard), !.
 
 %Uppon a trollThrow, move the troll and throw the rock
-move([Board, _ ,_], [Piece, [X,Y], Direction, trollThrow], NewBoard):-
+move([Board, Turn ,_], [Piece, [X,Y], Direction, trollThrow], NewBoard):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
     get_piece(Board, [Nx, Ny], Ocupied),
     piece_map(Piece, PieceType),
     set_piece(Board, [X,Y], 0, TempBoard),
     set_piece(TempBoard, [Nx, Ny], Piece, TempBoard2),
-    throw_rock(TempBoard2, [Nx, Ny], NewBoard), !.
+    throw_rock(TempBoard2, [Nx, Ny], NewBoard), 
+    assert(end_turn(Turn)), !.
 
 %Uppon a dwarfPush, move the dwarf and pieces in front one space in a given direction
 move([Board, _ ,_], [Piece, [X,Y], Direction, dwarfPush], NewBoard):-

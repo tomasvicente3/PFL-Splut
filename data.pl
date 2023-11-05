@@ -1,3 +1,6 @@
+%end_turn(+Turn)
+:- dynamic end_turn/1.
+
 %belongs(+Player, +Piece)
 belongs(1, 'S').
 belongs(1, 'D').
