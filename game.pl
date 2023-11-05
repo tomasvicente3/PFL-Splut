@@ -42,7 +42,11 @@ choose_move(Board, Player, Move):-
 
 choose_move(Board, Player, Move):-
     computer(Player, DificultyLevel), !,
-    choose_move(Board, Player, DificultyLevel, Move).
+    choose_move(Board, Player, DificultyLevel, Move),
+    [Piece, _, Direction, _] = Move,
+    piece_map(Piece, PieceName),
+    format('Computer ~w chose the move: ~w - ~w \n', [Player, PieceName, Direction]),
+    get_char(_).
 
 %choose_move(+Board, +Player, +DificultyLevel, -Move)
 %Given that the player is a computer, chooses a move based on the dificulty level
