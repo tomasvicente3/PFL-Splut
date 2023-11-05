@@ -78,7 +78,7 @@ display_bar_aux(Length, Index) :-
 
 %display_board(+Board, +N, +Length)
 %Base case, when there are no more rows to display changes line
-display_board([], _, _) :- write('|\n').
+display_board([], _, _) :- write('\n').
 
 %display_board(+Board, +N, +Length)
 %Recursive predicate that prints the row number, calls display_board_row and adds a bar at the bottom
@@ -92,7 +92,7 @@ display_board([Row | Rest], N, Length) :-
 
 %display_board_row(+Row)
 %Base case, when there are no more cells to display changes line
-display_board_row([]) :- write('|\n').
+display_board_row([]) :- write('\n').
 
 %If the cell is -1 only displays spaces
 display_board_row([-1 | Rest]) :- write('    '), display_board_row(Rest).
