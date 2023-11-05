@@ -55,10 +55,10 @@ display_header(Length):-
 %display_header_aux(+Length, +Index)
 %Recursive preditate that while Index is less than Length, displays the number of the column and increments Index
 display_header_aux(Length, Index) :- Index > Length, !, write('|\n').
+
 display_header_aux(Length, Index) :-
-    write('| '),
-    write(Index),
-    write(' '),
+    format('| ~w', [Index]),
+    (Index < 10 -> write(' '); true),
     I1 is Index + 1,
     display_header_aux(Length, I1).
 
@@ -96,6 +96,8 @@ display_board_row([]) :- write('|\n').
 
 %If the cell is -1 only displays spaces
 display_board_row([-1 | Rest]) :- write('    '), display_board_row(Rest).
+
+display_board_row([-2 | Rest]) :- write('|   '), display_board_row(Rest).
 
 %If the cell is 0 displays the cell but with empty space
 display_board_row([0 | Rest]) :- write('|   '), display_board_row(Rest).
