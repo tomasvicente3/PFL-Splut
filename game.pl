@@ -13,7 +13,7 @@ game_loop([Board, Turn, Steps], Player) :-
 %If the game is over, stop
 step(GameState,_,_) :- game_over(GameState), !.
 
-%If the player has no steps left, stop
+%If the player has no steps left, end turn
 step([NewBoard, _, 0], _, NewBoard) :- !.
 
 %If the player has steps left, the player chooses the move, the move is made and the game is displayed
@@ -59,7 +59,7 @@ move([Board, _ ,_], [Piece, [X,Y], Direction, emptySpace], NewBoard):-
     set_piece(TempBoard, [Nx, Ny], Piece, TempBoard2),
     levitate_rock(TempBoard2, Direction, NewBoard), !.
 
-%Uppon a trollPull, move the troll and the rock behind him
+%Upon a trollPull, move the troll and the rock behind him
 move([Board, _ ,_], [Piece, [X,Y], Direction, trollPull], NewBoard):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,

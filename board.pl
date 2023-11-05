@@ -25,7 +25,7 @@ can_move('Troll', Board, [X, Y], Direction, trollPull) :-
     get_piece(Board, [Ox, Oy], Ocupied2),
     Ocupied2 = 'R'.
 
-%A troll can move to a place where previously there was a rock and throw it
+%A troll can relocate to a spot occupied by a rock and then throw the rock.
 can_move('Troll', Board, [X, Y], Direction, trollThrow) :-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx,
