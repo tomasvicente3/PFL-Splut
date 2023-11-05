@@ -144,9 +144,18 @@ choose_direction(ListOfDirections, ChosenDirection):-
     read_option(1, Length, Option),
     nth1(Option, ListOfDirections, ChosenDirection).
 
-/*
+display_levitating_rocks(_, 0, _) :- nl.
+display_levitating_rocks([[X, Y]|T], N, I) :-
+    format('~w. Rock (~w, ~w) \n', [I, X, Y]),
+    N1 is N - 1,
+    I1 is I + 1,
+    display_levitating_rocks(T, N1, I1).
 
-*/
+choose_levitating_rock(LevitatingRocks, ChosenRockIndex) :-
+    length(LevitatingRocks, Length),
+    display_levitating_rocks(LevitatingRocks, Length, 1),
+    read_option(1, Length, ChosenRockIndex).
+    
 print_congratulations(1) :-
     write('  ____   _         _  __   __ _____  ____      _ '), nl,
     write(' |  _ \\ | |       / \\ \\ \\ / /| ____||  _ \\    / |'), nl,

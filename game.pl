@@ -26,14 +26,24 @@ choose_move(Board, Player, Move):-
 
     read_option(1, Length, Option),
     nth1(Option, ListOfMoves, Move).
-    
 
 move(Board, [Piece, [X,Y], Direction, emptySpace], NewBoard):-
+    piece_map(Piece, PieceType),
+    PieceType \= 'Sorcerer', !,
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
     set_piece(Board, [X,Y], 0, TempBoard),
-    set_piece(TempBoard, [Nx, Ny], Piece, NewBoard).
+    set_piece(TempBoard, [Nx, Ny], Piece, NewBoard), !.
 
+%When its a sorcerer going to an empty space
+move(Board, [Piece, [X,Y], Direction, emptySpace], NewBoard):-
+    piece_map(Piece, PieceType),
+    PieceType = 'Sorcerer', !,
+    direction_map(Direction, [Dx, Dy]),
+    Nx is X + Dx, Ny is Y + Dy,
+    set_piece(Board, [X,Y], 0, TempBoard),
+    set_piece(TempBoard, [Nx, Ny], Piece, TempBoard2),
+    levitate_rock(TempBoard2, Direction, NewBoard), !.
 
 move(Board, [Piece, [X,Y], Direction, trollPull], NewBoard):-
     direction_map(Direction, [Dx, Dy]),
