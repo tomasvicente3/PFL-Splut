@@ -38,7 +38,7 @@ O *StoneTroll* é uma peça com duas habilidades distintas: arrastar e atirar um
 
 Se exitir uma pedra adjacente no sentido oposto ao movimento, o *StoneTroll* pode escolher movimentá-la consigo.
 
-<img src="doc/Troll_Pull.png" height="260">
+<img src="doc/_Troll_Pull.png_Troll_Pull.png" height="260">
 
 ####    Atirar
 
