@@ -38,8 +38,8 @@ print_rules:-
     write('board. The game ends when only one player remains or when all players agree to end it.\n\n').
 
 %--------------GAME--------------
-%display_game(+Board)
-display_game(Board) :-
+%display_game(+GameState)
+display_game([Board, _, _]) :-
     clear_screen,
     length(Board, Length),
     display_header(Length),
@@ -78,7 +78,7 @@ display_bar_aux(Length, Index) :-
 
 %display_board(+Board, +N, +Length)
 %Base case, when there are no more rows to display changes line
-display_board([], _, _) :- write('|\n').
+display_board([], _, _) :- write('\n').
 
 %display_board(+Board, +N, +Length)
 %Recursive predicate that prints the row number, calls display_board_row and adds a bar at the bottom
@@ -92,7 +92,7 @@ display_board([Row | Rest], N, Length) :-
 
 %display_board_row(+Row)
 %Base case, when there are no more cells to display changes line
-display_board_row([]) :- write('|\n').
+display_board_row([]) :- write('\n').
 
 %If the cell is -1 only displays spaces
 display_board_row([-1 | Rest]) :- write('    '), display_board_row(Rest).
@@ -180,10 +180,16 @@ display_directions([Direction|T], N, I) :-
 
 %choose_levitating_rock(+LevitatingRocks, -ChosenRockIndex)
 %Displays the list of levitating rocks and reads the chosen rock
-choose_levitating_rock(LevitatingRocks, ChosenRockIndex) :-
+choose_levitating_rock(Player, LevitatingRocks, ChosenRockIndex) :-
+    human(Player), !,
     length(LevitatingRocks, Length),
     display_levitating_rocks(LevitatingRocks, Length, 1),
     read_option(1, Length, ChosenRockIndex).
+
+choose_levitating_rock(Player, LevitatingRocks, ChosenRockIndex):-
+    computer(Player, 1), !,
+    length(LevitatingRocks, Length),
+    custom_random(1, Length, ChosenRockIndex).
 
 %display_levitating_rocks(+LevitatingRocks, +N, +I)
 %Base case, when there are no more rocks to display changes line

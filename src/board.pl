@@ -65,20 +65,29 @@ can_push(Board, [X, Y], Direction):-
 valid_moves([Board,_, _], Player, ListOfMoves):-
     findall(Piece, belongs(Player, Piece), PlayerPieces),
     get_positions(Board, PlayerPieces, PiecesPosition),
-    get_moves(Board, PlayerPieces, PiecesPosition, ListOfMoves).
+    get_moves(Board, PiecesPosition, ListOfMoves).
 
 %get_positions(+Board, +PiecesList, -PiecesPosition)
-get_positions(Board, PiecesList, PiecesPosition):-
-    findall([X, Y], (member(Piece, PiecesList), nth1(Y, Board, Row), nth1(X, Row, Piece)), PiecesPosition).
+get_positions(_, [], []).
+get_positions(Board, [Piece | Rest], [[Piece,[X,Y]] | RestPiecesPosition]):-
+    nth1(Y, Board, Row),
+    nth1(X, Row, Piece),
+    get_positions(Board, Rest, RestPiecesPosition).
+get_positions(Board, [_ | Rest], PiecesPosition):-
+    get_positions(Board, Rest, PiecesPosition).
 
-%get_moves(+Board, +PiecesList, +PiecesPosition, -ListOfMoves)
-get_moves(_, [], _, []).
-get_moves(Board, [Piece | RestPieces], [[X, Y] | RestPositions], ListOfMoves):-
+%get_all_rocks(+Board, -RockPositions)
+get_all_rocks(Board, RockPositions):-
+    findall([X,Y], (nth1(Y,Board,Row), nth1(X,Row,'R')), RockPositions), !.
+
+%get_moves(+Board, +PiecesList, -ListOfMoves)
+get_moves(_, [], []).
+get_moves(Board, [[Piece, [X, Y]] | RestPieces], ListOfMoves):-
     Directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'],
     findall([Piece, [X,Y], Direction, MoveType], 
             (member(Direction, Directions), piece_map(Piece, PieceType), can_move(PieceType, Board, [X, Y], Direction, MoveType)), 
             PieceMoves),
-    get_moves(Board, RestPieces, RestPositions, RestMoves),
+    get_moves(Board, RestPieces, RestMoves),
     append(PieceMoves, RestMoves, ListOfMoves).
 
 %get_piece(+Board, +Position, -Ocupied)
@@ -123,12 +132,38 @@ in_bounds(Board, [X,Y]):-
     length(Board, Size),
     X =< Size, Y =< Size.
 
-%throw_rock(+Board, +Position, -NewBoard)
-throw_rock(Board, [X,Y], NewBoard):-
+%throw_rock(+Board, +Player, +Position, -NewBoard)
+throw_rock(Board, Player, [X,Y], NewBoard):-
+    human(Player), !,
     Directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'],
     findall(Direction, (member(Direction, Directions), can_throw(Board, [X,Y], Direction)), ListOfDirections),!,
     write('\nChoose a direction to throw the rock: \n'),
     choose_direction(ListOfDirections, ChosenDirection),
+    direction_map(ChosenDirection, [Dx, Dy]),
+    Nx is X + Dx, Ny is Y + Dy,
+    flying_rock(Board, [Nx,Ny], ChosenDirection, NewBoard).
+
+throw_rock(Board, Player, [X,Y], NewBoard):-
+    computer(Player, 1), !,
+    Directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'],
+    findall(Direction, (member(Direction, Directions), can_throw(Board, [X,Y], Direction)), ListOfDirections),!,
+    length(ListOfDirections, Length),
+    custom_random(1, Length, ChosenDirectionIndex),
+    nth1(ChosenDirectionIndex, ListOfDirections, ChosenDirection),
+    format("\nComputer ~w chose to throw the rock ~w \n",[Player, ChosenDirection]),
+    get_char(_),
+    direction_map(ChosenDirection, [Dx, Dy]),
+    Nx is X + Dx, Ny is Y + Dy,
+    flying_rock(Board, [Nx,Ny], ChosenDirection, NewBoard).
+
+throw_rock(Board, Player, [X,Y], NewBoard):-
+    computer(Player, 2), !,
+    Directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'],
+    findall(Direction, (member(Direction, Directions), can_throw(Board, [X,Y], Direction)), ListOfDirections),!,
+    
+    findall([Direction, Value], (member(Direction, ListOfDirections), direction_map(Direction, [Dxl, Dyl]), Tx is X + Dxl, Ty is Y + Dyl, flying_rock(Board, [Tx,Ty], Direction, TempBoard) ,value([TempBoard, _, _], Player, Value)), ListOfValues),
+    get_best(ListOfValues, ChosenDirection),
+
     direction_map(ChosenDirection, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
     flying_rock(Board, [Nx,Ny], ChosenDirection, NewBoard).
@@ -173,13 +208,12 @@ shift_line(Board, [X, Y], Direction, NewBoard) :-
 
 %shift_line_aux(+Board, +Position, +Direction, -NewBoard, +Length)
 %Base case, we shifted all the pieces (Put the 0 in the initial position)
-shift_line_aux(Board, [X, Y], Direction, NewBoard, 0) :-
+shift_line_aux(Board, [X, Y], _, NewBoard, 0) :-
     set_piece(Board, [X, Y], 0, NewBoard), !.
 
 %We shift the front piece one space (Initial pos + direction*(length-1) -> (Initial pos + direction*length)
 shift_line_aux(Board, [X, Y], Direction, NewBoard, Length) :-
     Length > 0,
-    direction_map(Direction, [Dx, Dy]),
 
     multiply_direction(Direction, Length-1, [Dx2, Dy2]),
     Nx is X + Dx2, Ny is Y + Dy2,
@@ -221,13 +255,15 @@ multiply_direction(Direction, Length, [Dx, Dy]) :-
     Dx is Dx1 * Length,
     Dy is Dy1 * Length.
 
-%levitate_rock(+Board, +Direction, -NewBoard)
+%levitate_rock(+GameState, +Direction, +Player, -NewBoard)
 %A rock can be levitated if there is an empty space walking in the direction of the sorcerer
-levitate_rock(Board, Direction, NewBoard) :-
+levitate_rock([Board, Turn, Steps], Direction, Player, NewBoard) :-
+    human(Player),
+    \+ non_continuous_levitate(Turn),
     direction_map(Direction, [Dx, Dy]),
-    get_positions(Board, ['R'], Positions),
+    get_all_rocks(Board, Positions),
 
-    findall([X, Y], (member([X, Y], Positions), X2 is X + Dx, Y2 is Y + Dy, get_piece(Board, [X2, Y2], Piece), Piece = 0), LevitatingRocks),
+    findall([X, Y], (levitate_free_space(Board, [X, Y], [Dx, Dy], Positions)), LevitatingRocks),
     length(LevitatingRocks, Length),
     Length > 0, !,
     write('Do you want to levitate a rock? \n'),
@@ -235,14 +271,137 @@ levitate_rock(Board, Direction, NewBoard) :-
     write('2. No \n'),
     read_option(1, 2, UserResponse),
     (UserResponse = 1 ->
+        assertz(levitating(Turn, Steps)),
         write('Choose a rock to levitate: \n'),
-        choose_levitating_rock(LevitatingRocks, ChosenRockIndex),
+        choose_levitating_rock(Player, LevitatingRocks, ChosenRockIndex),
         nth1(ChosenRockIndex, LevitatingRocks, [RX, RY]),
         set_piece(Board, [RX, RY], 0, TempBoard),
         NX is RX + Dx, NY is RY + Dy,
         set_piece(TempBoard, [NX, NY], 'R', NewBoard)
-    ; 
+    ;
+        assertz(not_levitating(Turn, Steps)),
         NewBoard = Board
     ).
 
-levitate_rock(Board, _, Board).
+levitate_rock([Board, Turn, Steps], Direction, Player, NewBoard) :-
+    computer(Player, 1),
+    \+ non_continuous_levitate(Turn),
+    direction_map(Direction, [Dx, Dy]),
+    get_all_rocks(Board, Positions),
+
+    findall([X, Y], (levitate_free_space(Board, [X, Y], [Dx, Dy], Positions)), LevitatingRocks),
+    length(LevitatingRocks, Length),
+    Length > 0, !,
+    custom_random(1,2, BotDecision),
+    (BotDecision = 1 ->
+        assertz(levitating(Turn, Steps)),
+        choose_levitating_rock(Player, LevitatingRocks, ChosenRockIndex),
+        nth1(ChosenRockIndex, LevitatingRocks, [RX, RY]),
+        format("Computer ~w chose to levitate the rock in (~w,~w) \n", [Player, RX, RY]),
+        get_char(_),
+        set_piece(Board, [RX, RY], 0, TempBoard),
+        NX is RX + Dx, NY is RY + Dy,
+        set_piece(TempBoard, [NX, NY], 'R', NewBoard)
+    ;
+        format("Computer ~w chose to not levitate a rock \n", [Player]), get_char(_),
+        assertz(not_levitating(Turn, Steps)), 
+        NewBoard = Board
+    ).
+
+levitate_rock([Board, Turn, Steps], Direction, Player, NewBoard) :-
+    computer(Player, 2),
+    \+ non_continuous_levitate(Turn),
+    direction_map(Direction, [Dx, Dy]),
+    get_all_rocks(Board, Positions),
+
+    findall([X, Y], (levitate_free_space(Board, [X, Y], [Dx, Dy], Positions)), LevitatingRocks),
+    length(LevitatingRocks, Length),
+    Length > 0, !,
+    custom_random(1,2, BotDecision),
+    (BotDecision = 1 ->
+        assertz(levitating(Turn, Steps)),
+        choose_levitating_rock(Player, LevitatingRocks, ChosenRockIndex),
+        nth1(ChosenRockIndex, LevitatingRocks, [RX, RY]),
+        get_char(_),
+        set_piece(Board, [RX, RY], 0, TempBoard),
+        NX is RX + Dx, NY is RY + Dy,
+        set_piece(TempBoard, [NX, NY], 'R', NewBoard)
+    ;
+        assertz(not_levitating(Turn, Steps)), 
+        NewBoard = Board
+    ).
+
+levitate_rock([Board, _, _], _, _, Board).
+
+
+%levitate_free_space(+Position, +Direction, +Positions)
+%checks if there is an empty space to levitate the rocks
+levitate_free_space(Board, [X, Y], [Dx, Dy], Positions) :-
+    member([X, Y], Positions),
+    X2 is X + Dx, Y2 is Y + Dy, 
+    get_piece(Board, [X2, Y2], Piece), 
+    Piece = 0.
+
+%non_continuous_levitate(+Turn)
+%Checks if the player has already levitated and stopped levitating a rock in a given turn
+non_continuous_levitate(Turn):-
+    levitating(Turn, Step1), not_levitating(Turn, Step2), 
+    integer(Step1), integer(Step2), 
+    Step2 < Step1.
+
+%value(+GameState, +Player, -Value)
+%Evaluates the board in terms of favorable positions for the player
+value([Board, _, _], Player, Value):-
+    get_positions(Board, ['R'], RockPositionsAux),
+    findall([X,Y], member([_,[X,Y]], RockPositionsAux), RockPositions),
+    
+    get_troll_pos(Board, Player, TrollPosition),
+    get_enemy_sorcerer_pos(Board,Player, EnemySorcererPosition),
+    
+    get_rock_distances(RockPositions, TrollPosition, EnemySorcererPosition, RockDistances),
+    get_min(RockDistances, Value), !.
+
+%get_troll_pos(+Board, +Player, -TrollPosition)
+%Gets the position of the player's troll
+get_troll_pos(Board, Player, TrollPosition):-
+    piece_map(Piece, 'Troll'),
+    belongs(Player, Piece),
+    get_positions(Board, [Piece], TrollPositionList),
+    nth1(1, TrollPositionList, [_, TrollPosition]).
+
+%get_enemy_sorcerer_pos(+Board, +Player, -EnemySorcererPosition)
+%Gets the position of the enemy sorcerer
+get_enemy_sorcerer_pos(Board, Player, EnemySorcererPosition):-
+    Enemy is 3 - Player,
+    piece_map(EnemyS, 'Sorcerer'),
+    belongs(Enemy, EnemyS),
+    get_positions(Board, [EnemyS], EnemySorcererPositionList),
+    nth1(1, EnemySorcererPositionList, [_,EnemySorcererPosition]).
+
+%sorcerer_dead(+Board, +Player)
+%Checks if the player's sorcerer is dead
+sorcerer_dead(Board, 1):-
+    get_positions(Board, ['S'], SorcererPositions),!,
+    SorcererPositions = [].
+
+sorcerer_dead(Board, 2):-
+    get_positions(Board, ['s'], SorcererPositions),!,
+    SorcererPositions = [].
+
+%get_best_move(+Board, +ListOfMoves, +Player, -BestMove)
+%Gets the best move for the player
+get_best_move(Board, ListOfMoves, Player, BestMove):-
+    findall([Move, Value], (member(Move, ListOfMoves), move([Board, _, _], Move, NewBoard), value([NewBoard, _, _], Player, Value)), ListOfValues),
+    get_best(ListOfValues, BestMove).
+
+%get_best(+ListOfValues, -BestMove)
+%Gets the best move from a list of moves
+get_best([[Move, Value] | Other], BestMove):-
+    get_best_aux(Other, Value, Move, BestMove).
+
+get_best_aux([], _, Move, Move).
+get_best_aux([[Move, Value] | Other], AccValue, _, BestMove):-
+    Value < AccValue, !,
+    get_best_aux(Other, Value, Move, BestMove).
+get_best_aux([_ | Other], AccValue, AccMove, BestMove):-
+    get_best_aux(Other, AccValue, AccMove, BestMove).

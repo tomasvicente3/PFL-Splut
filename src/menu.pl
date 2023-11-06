@@ -17,11 +17,11 @@ print_options(main_menu) :-
 %option(+MenuType, +Option)
 %Obtains the map size, the game mode and starts the game
 option(main_menu, 1) :-
+    clear_vars,
     menu(board_size, Size),
     menu(game_mode),
     initial_state(Size, GameState),
-    [Board, _, _] = GameState,
-    display_game(Board), !,
+    display_game(GameState), !,
     game_loop(GameState, 1).
 
 %option(+MenuType, +Option)
@@ -37,7 +37,8 @@ option(main_menu, 2):-
 
 %option(+MenuType, +Option)
 %Exits the game
-option(main_menu, 3) :- halt.
+option(main_menu, 3) :- 
+    halt.
 
 %menu(+MenuType, -Size)
 %Prints the board size options, gets the user input and returns the size
@@ -127,3 +128,11 @@ print_options(computer_difficulty, PlayerNum) :-
     format('Choose the AI behaviour for player ~d:\n', [PlayerNum]),
     write('1 - Basic\n'),
     write('2 - Intelligent\n').
+
+%clear_vars/0
+%removes all the dynamic predicates
+clear_vars:-
+    retractall(human(_)),
+    retractall(computer(_, _)),
+    retractall(levitating(_,_)),
+    retractall(not_levitating(_,_)).
