@@ -11,7 +11,7 @@ game_loop([Board, Turn, Steps], Player) :-
 %step(+GameState, +Player, -NewBoard)
 
 %If the game is over, stop
-step(GameState,_,_) :- game_over(GameState), !.
+step(GameState,_,_) :- game_over(GameState, Winner), !, congratulate(Winner).
 
 %If the player has no steps left, end turn
 step([NewBoard, _, 0], _, NewBoard) :- !.
@@ -84,16 +84,16 @@ move([Board, _ ,_], [Piece, [X,Y], Direction, trollThrow], NewBoard):-
 move([Board, _ ,_], [Piece, [X,Y], Direction, dwarfPush], NewBoard):-
     shift_line(Board, [X,Y], Direction, NewBoard), !.
 
-%game_over(+GameState)
+%game_over(+GameState, -Winner)
 %Checks if the game is over(There's a sorcerer missing)
-game_over([Board, _, _]):-
+game_over([Board, _, _], Winner):-
     get_positions(Board, ['S'], Positions),
     Positions = [], !,
-    congratulate(2).
-game_over([Board, _, _]):-
+    Winner = 2.
+game_over([Board, _, _], Winner):-
     get_positions(Board, ['s'], Positions),
     Positions = [], !,
-    congratulate(1).
+    Winner = 1.
 
 %congratulate(+Winner)
 congratulate(Winner):-
