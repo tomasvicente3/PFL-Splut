@@ -288,7 +288,7 @@ levitate_rock([Board, Turn, Steps], Direction, Player, NewBoard) :-
         NX is RX + Dx, NY is RY + Dy,
         set_piece(TempBoard, [NX, NY], 'R', NewBoard)
     ;
-        format("Computer ~w chose not to levitate a rock \n", [Player]), get_char(_),
+        format("Computer ~w chose to not levitate a rock \n", [Player]), get_char(_),
         assertz(not_levitating(Turn, Steps)), 
         NewBoard = Board
     ).
