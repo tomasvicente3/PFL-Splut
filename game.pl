@@ -29,6 +29,7 @@ step(GameState, Player, NewBoard):-
 %choose_move(+Board, +Player, -Move)
 %Gets the list of valid moves, displays them and asks the player to choose one
 choose_move(Board, Player, Move):-
+    human(Player), !,
     valid_moves([Board,_, _], Player, ListOfMoves),
     length(ListOfMoves, Length),
     Length > 0, !,
@@ -37,6 +38,23 @@ choose_move(Board, Player, Move):-
     display_moves(ListOfMoves, Length, 1),
 
     read_option(1, Length, Option),
+    nth1(Option, ListOfMoves, Move).
+
+choose_move(Board, Player, Move):-
+    computer(Player, DificultyLevel), !,
+    choose_move(Board, Player, DificultyLevel, Move),
+    [Piece, _, Direction, _] = Move,
+    piece_map(Piece, PieceName),
+    format('Computer ~w chose the move: ~w(~w) - ~w \n', [Player, PieceName, Piece, Direction]),
+    get_char(_).
+
+%choose_move(+Board, +Player, +DificultyLevel, -Move)
+%Given that the player is a computer, chooses a move based on the dificulty level
+choose_move(Board, Player, 1, Move):- !,
+    valid_moves([Board,_, _], Player, ListOfMoves),
+    length(ListOfMoves, Length),
+    Length > 0, !,
+    custom_random(1, Length, Option),
     nth1(Option, ListOfMoves, Move).
 
 %move(+GameState, +Move, -NewGameState)
@@ -57,7 +75,8 @@ move([Board, _ ,_], [Piece, [X,Y], Direction, emptySpace], NewBoard):-
     Nx is X + Dx, Ny is Y + Dy,
     set_piece(Board, [X,Y], 0, TempBoard),
     set_piece(TempBoard, [Nx, Ny], Piece, TempBoard2),
-    levitate_rock(TempBoard2, Direction, NewBoard), !.
+    belongs(Player, Piece),
+    levitate_rock(TempBoard2, Direction, Player, NewBoard), !.
 
 %Upon a trollPull, move the troll and the rock behind him
 move([Board, _ ,_], [Piece, [X,Y], Direction, trollPull], NewBoard):-
@@ -74,14 +93,13 @@ move([Board, _ ,_], [Piece, [X,Y], Direction, trollPull], NewBoard):-
 move([Board, _ ,_], [Piece, [X,Y], Direction, trollThrow], NewBoard):-
     direction_map(Direction, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
-    get_piece(Board, [Nx, Ny], Ocupied),
-    piece_map(Piece, PieceType),
     set_piece(Board, [X,Y], 0, TempBoard),
     set_piece(TempBoard, [Nx, Ny], Piece, TempBoard2),
-    throw_rock(TempBoard2, [Nx, Ny], NewBoard), !.
+    belongs(Player, Piece),
+    throw_rock(TempBoard2, Player, [Nx, Ny], NewBoard), !.
 
 %Uppon a dwarfPush, move the dwarf and pieces in front one space in a given direction
-move([Board, _ ,_], [Piece, [X,Y], Direction, dwarfPush], NewBoard):-
+move([Board, _ ,_], [_, [X,Y], Direction, dwarfPush], NewBoard):-
     shift_line(Board, [X,Y], Direction, NewBoard), !.
 
 %game_over(+GameState)
