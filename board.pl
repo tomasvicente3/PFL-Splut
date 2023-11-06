@@ -234,10 +234,11 @@ multiply_direction(Direction, Length, [Dx, Dy]) :-
     Dx is Dx1 * Length,
     Dy is Dy1 * Length.
 
-%levitate_rock(+Board, +Direction, +Player, -NewBoard)
+%levitate_rock(+GameState, +Direction, +Player, -NewBoard)
 %A rock can be levitated if there is an empty space walking in the direction of the sorcerer
-levitate_rock(Board, Direction, Player, NewBoard) :-
+levitate_rock([Board, Turn, Steps], Direction, Player, NewBoard) :-
     human(Player),
+    \+ non_continuous_levitate(Turn),
     direction_map(Direction, [Dx, Dy]),
     get_positions(Board, ['R'], Positions),
 
@@ -249,18 +250,21 @@ levitate_rock(Board, Direction, Player, NewBoard) :-
     write('2. No \n'),
     read_option(1, 2, UserResponse),
     (UserResponse = 1 ->
+        assertz(levitating(Turn, Steps)),
         write('Choose a rock to levitate: \n'),
         choose_levitating_rock(Player, LevitatingRocks, ChosenRockIndex),
         nth1(ChosenRockIndex, LevitatingRocks, [RX, RY]),
         set_piece(Board, [RX, RY], 0, TempBoard),
         NX is RX + Dx, NY is RY + Dy,
         set_piece(TempBoard, [NX, NY], 'R', NewBoard)
-    ; 
+    ;
+        assertz(not_levitating(Turn, Steps)),
         NewBoard = Board
     ).
 
-levitate_rock(Board, Direction, Player, NewBoard) :-
+levitate_rock([Board, Turn, Steps], Direction, Player, NewBoard) :-
     computer(Player, 1),
+    \+ non_continuous_levitate(Turn),
     direction_map(Direction, [Dx, Dy]),
     get_positions(Board, ['R'], Positions),
 
@@ -269,6 +273,7 @@ levitate_rock(Board, Direction, Player, NewBoard) :-
     Length > 0, !,
     custom_random(1,2, BotDecision),
     (BotDecision = 1 ->
+        assertz(levitating(Turn, Steps)),
         choose_levitating_rock(Player, LevitatingRocks, ChosenRockIndex),
         nth1(ChosenRockIndex, LevitatingRocks, [RX, RY]),
         format("Computer ~w chose to levitate the rock in (~w,~w) \n", [Player, RX, RY]),
@@ -276,11 +281,12 @@ levitate_rock(Board, Direction, Player, NewBoard) :-
         set_piece(Board, [RX, RY], 0, TempBoard),
         NX is RX + Dx, NY is RY + Dy,
         set_piece(TempBoard, [NX, NY], 'R', NewBoard)
-    ; 
+    ;
+        assertz(not_levitating(Turn, Steps)), 
         NewBoard = Board
     ).
 
-levitate_rock(Board, _, _, Board).
+levitate_rock([Board, _, _], _, _, Board).
 
 
 %levitate_free_space(+Position, +Direction, +Positions)
@@ -291,6 +297,10 @@ levitate_free_space(Board, [X, Y], [Dx, Dy], Positions) :-
     get_piece(Board, [X2, Y2], Piece), 
     Piece = 0.
 
+%non_continuous_levitate(+Turn)
+%Checks if the player has already levitated and stopped levitating a rock in a given turn
+non_continuous_levitate(Turn):-
+    levitating(Turn, Step1), not_levitating(Turn, Step2), Step2 < Step1.
 
 %value(+GameState, +Player, -Value)
 %Evaluates the board in terms of favorable positions for the player
