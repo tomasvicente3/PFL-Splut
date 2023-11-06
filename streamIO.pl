@@ -180,10 +180,16 @@ display_directions([Direction|T], N, I) :-
 
 %choose_levitating_rock(+LevitatingRocks, -ChosenRockIndex)
 %Displays the list of levitating rocks and reads the chosen rock
-choose_levitating_rock(LevitatingRocks, ChosenRockIndex) :-
+choose_levitating_rock(Player, LevitatingRocks, ChosenRockIndex) :-
+    human(Player), !,
     length(LevitatingRocks, Length),
     display_levitating_rocks(LevitatingRocks, Length, 1),
     read_option(1, Length, ChosenRockIndex).
+
+choose_levitating_rock(Player, LevitatingRocks, ChosenRockIndex):-
+    computer(Player, 1), !,
+    length(LevitatingRocks, Length),
+    custom_random(1, Length, ChosenRockIndex).
 
 %display_levitating_rocks(+LevitatingRocks, +N, +I)
 %Base case, when there are no more rocks to display changes line

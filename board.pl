@@ -123,12 +123,26 @@ in_bounds(Board, [X,Y]):-
     length(Board, Size),
     X =< Size, Y =< Size.
 
-%throw_rock(+Board, +Position, -NewBoard)
-throw_rock(Board, [X,Y], NewBoard):-
+%throw_rock(+Board, +Player, +Position, -NewBoard)
+throw_rock(Board, Player, [X,Y], NewBoard):-
+    human(Player), !,
     Directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'],
     findall(Direction, (member(Direction, Directions), can_throw(Board, [X,Y], Direction)), ListOfDirections),!,
     write('\nChoose a direction to throw the rock: \n'),
     choose_direction(ListOfDirections, ChosenDirection),
+    direction_map(ChosenDirection, [Dx, Dy]),
+    Nx is X + Dx, Ny is Y + Dy,
+    flying_rock(Board, [Nx,Ny], ChosenDirection, NewBoard).
+
+throw_rock(Board, Player, [X,Y], NewBoard):-
+    computer(Player, 1), !,
+    Directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'],
+    findall(Direction, (member(Direction, Directions), can_throw(Board, [X,Y], Direction)), ListOfDirections),!,
+    length(ListOfDirections, Length),
+    custom_random(1, Length, ChosenDirectionIndex),
+    nth1(ChosenDirectionIndex, ListOfDirections, ChosenDirection),
+    format("\nComputer ~w chose to throw the rock ~w \n",[Player, ChosenDirection]),
+    get_char(_),
     direction_map(ChosenDirection, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
     flying_rock(Board, [Nx,Ny], ChosenDirection, NewBoard).
@@ -173,13 +187,12 @@ shift_line(Board, [X, Y], Direction, NewBoard) :-
 
 %shift_line_aux(+Board, +Position, +Direction, -NewBoard, +Length)
 %Base case, we shifted all the pieces (Put the 0 in the initial position)
-shift_line_aux(Board, [X, Y], Direction, NewBoard, 0) :-
+shift_line_aux(Board, [X, Y], _, NewBoard, 0) :-
     set_piece(Board, [X, Y], 0, NewBoard), !.
 
 %We shift the front piece one space (Initial pos + direction*(length-1) -> (Initial pos + direction*length)
 shift_line_aux(Board, [X, Y], Direction, NewBoard, Length) :-
     Length > 0,
-    direction_map(Direction, [Dx, Dy]),
 
     multiply_direction(Direction, Length-1, [Dx2, Dy2]),
     Nx is X + Dx2, Ny is Y + Dy2,
@@ -221,9 +234,10 @@ multiply_direction(Direction, Length, [Dx, Dy]) :-
     Dx is Dx1 * Length,
     Dy is Dy1 * Length.
 
-%levitate_rock(+Board, +Direction, -NewBoard)
+%levitate_rock(+Board, +Direction, +Player, -NewBoard)
 %A rock can be levitated if there is an empty space walking in the direction of the sorcerer
-levitate_rock(Board, Direction, NewBoard) :-
+levitate_rock(Board, Direction, Player, NewBoard) :-
+    human(Player),
     direction_map(Direction, [Dx, Dy]),
     get_positions(Board, ['R'], Positions),
 
@@ -236,7 +250,7 @@ levitate_rock(Board, Direction, NewBoard) :-
     read_option(1, 2, UserResponse),
     (UserResponse = 1 ->
         write('Choose a rock to levitate: \n'),
-        choose_levitating_rock(LevitatingRocks, ChosenRockIndex),
+        choose_levitating_rock(Player, LevitatingRocks, ChosenRockIndex),
         nth1(ChosenRockIndex, LevitatingRocks, [RX, RY]),
         set_piece(Board, [RX, RY], 0, TempBoard),
         NX is RX + Dx, NY is RY + Dy,
@@ -245,4 +259,57 @@ levitate_rock(Board, Direction, NewBoard) :-
         NewBoard = Board
     ).
 
-levitate_rock(Board, _, Board).
+levitate_rock(Board, Direction, Player, NewBoard) :-
+    computer(Player, 1),
+    direction_map(Direction, [Dx, Dy]),
+    get_positions(Board, ['R'], Positions),
+
+    findall([X, Y], (member([X, Y], Positions), X2 is X + Dx, Y2 is Y + Dy, get_piece(Board, [X2, Y2], Piece), Piece = 0), LevitatingRocks),
+    length(LevitatingRocks, Length),
+    Length > 0, !,
+    custom_random(1,2, BotDecision),
+    (BotDecision = 1 ->
+        choose_levitating_rock(Player, LevitatingRocks, ChosenRockIndex),
+        nth1(ChosenRockIndex, LevitatingRocks, [RX, RY]),
+        format("Computer ~w chose to levitate the rock in (~w,~w) \n", [Player, RX, RY]),
+        get_char(_),
+        set_piece(Board, [RX, RY], 0, TempBoard),
+        NX is RX + Dx, NY is RY + Dy,
+        set_piece(TempBoard, [NX, NY], 'R', NewBoard)
+    ; 
+        NewBoard = Board
+    ).
+
+levitate_rock(Board, _, _, Board).
+
+%value(+GameState, +Player, -Value)
+%Evaluates the board in terms of favorable positions for the player
+value([Board, _, _], Player, Value):-
+    get_positions(Board, ['R'], Positions),
+    
+    get_troll_pos(Board, Player, TrollPosition),
+
+    get_enemy_sorcerer_pos(Board,Player, EnemySorcererPosition),
+    
+    get_pos_distances(Positions, TrollPosition, RockPosDistances),
+    get_min_from_pos_dist(RockPosDistances, ClosestRockPos, ClosestRockDistance),
+    get_distances([ClosestRockPos], EnemySorcererPosition, SorcererDistances),
+    nth1(1, SorcererDistances, RockToSorcererDist),
+    Value is ClosestRockDistance+RockToSorcererDist.
+
+%get_troll_pos(+Board, +Player, -TrollPosition)
+%Gets the position of the player's troll
+get_troll_pos(Board, Player, TrollPosition):-
+    piece_map(Piece, 'Troll'),
+    belongs(Player, Piece),
+    get_positions(Board, [Piece], TrollPositionList),
+    nth1(1, TrollPositionList, TrollPosition).
+
+%get_enemy_sorcerer_pos(+Board, +Player, -EnemySorcererPosition)
+%Gets the position of the enemy sorcerer
+get_enemy_sorcerer_pos(Board, Player, EnemySorcererPosition):-
+    Enemy is 3 - Player,
+    piece_map(EnemyS, 'Sorcerer'),
+    belongs(Enemy, EnemyS),
+    get_positions(Board, [EnemyS], EnemySorcererPositionList),
+    nth1(1, EnemySorcererPositionList, EnemySorcererPosition).
