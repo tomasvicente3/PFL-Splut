@@ -21,10 +21,15 @@ step(GameState, Player, NewBoard):-
     [Board, _, Steps] = GameState,
     format("\nPlayer ~w's turn (~w steps left)\n", [Player, Steps]), nl,
     choose_move(Board, Player, Move),
+    get_new_step(Move, Steps, NewSteps),
     move(GameState, Move, AccBoard),
     display_game([AccBoard, _, _]),
-    NewSteps is Steps - 1,
     step([AccBoard, _, NewSteps], Player, NewBoard).
+
+%get_new_step(+Move, +Steps, -NewSteps)
+%If the move is a trollThrow, there should be no more steps left
+get_new_step([_, _, _, trollThrow], _, 0):- !.
+get_new_step(_, Steps, NewSteps):- NewSteps is Steps - 1.
 
 %choose_move(+Board, +Player, -Move)
 %Gets the list of valid moves, displays them and asks the player to choose one
