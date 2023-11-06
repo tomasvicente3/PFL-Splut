@@ -43,11 +43,11 @@ get_min_from_pos_dist([[Pos,Dist]| T], MinPos, MinDist):-
     get_min_from_pos_dist_aux(T, Pos, Dist, MinPos, MinDist).
 
 get_min_from_pos_dist_aux([], MinPos, MinDist, MinPos, MinDist).
-get_min_from_pos_dist_aux([[Pos,Dist]| T], AccPos, AccDist, MinPos, MinDist):-
+get_min_from_pos_dist_aux([[Pos,Dist]| T], _, AccDist, MinPos, MinDist):-
     min(Dist, AccDist, NewAccDist),
     NewAccDist = Dist,
     get_min_from_pos_dist_aux(T, Pos, NewAccDist, MinPos, MinDist).
-get_min_from_pos_dist_aux([[Pos,Dist]| T], AccPos, AccDist, MinPos, MinDist):-
+get_min_from_pos_dist_aux([[_,Dist]| T], AccPos, AccDist, MinPos, MinDist):-
     min(Dist, AccDist, NewAccDist),
     NewAccDist \= Dist,
     get_min_from_pos_dist_aux(T, AccPos, NewAccDist, MinPos, MinDist).

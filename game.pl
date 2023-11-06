@@ -18,13 +18,18 @@ step([NewBoard, _, 0], _, NewBoard) :- !.
 
 %If the player has steps left, the player chooses the move, the move is made and the game is displayed
 step(GameState, Player, NewBoard):-
-    [Board, _, Steps] = GameState,
+    [Board, Turn, Steps] = GameState,
     format("\nPlayer ~w's turn (~w steps left)\n", [Player, Steps]), nl,
     choose_move(Board, Player, Move),
+    get_new_step(Move, Steps, NewSteps),
     move(GameState, Move, AccBoard),
     display_game([AccBoard, _, _]),
-    NewSteps is Steps - 1,
-    step([AccBoard, _, NewSteps], Player, NewBoard).
+    step([AccBoard, Turn, NewSteps], Player, NewBoard).
+
+%get_new_step(+Move, +Steps, -NewSteps)
+%If the move is a trollThrow, there should be no more steps left, else it should be decremented by 1.
+get_new_step([_, _, _, trollThrow], _, 0):- !.
+get_new_step(_, Steps, NewSteps):- NewSteps is Steps - 1.
 
 %choose_move(+Board, +Player, -Move)
 %Gets the list of valid moves, displays them and asks the player to choose one
@@ -68,7 +73,7 @@ move([Board, _ ,_], [Piece, [X,Y], Direction, emptySpace], NewBoard):-
     set_piece(TempBoard, [Nx, Ny], Piece, NewBoard), !.
 
 %When a Sorcerer is going to an empty space, ask the player if he wants to levitate a rock
-move([Board, _ ,_], [Piece, [X,Y], Direction, emptySpace], NewBoard):-
+move([Board, Turn ,Step], [Piece, [X,Y], Direction, emptySpace], NewBoard):-
     piece_map(Piece, PieceType),
     PieceType = 'Sorcerer', !,
     direction_map(Direction, [Dx, Dy]),
@@ -76,7 +81,7 @@ move([Board, _ ,_], [Piece, [X,Y], Direction, emptySpace], NewBoard):-
     set_piece(Board, [X,Y], 0, TempBoard),
     set_piece(TempBoard, [Nx, Ny], Piece, TempBoard2),
     belongs(Player, Piece),
-    levitate_rock(TempBoard2, Direction, Player, NewBoard), !.
+    levitate_rock([TempBoard2, Turn, Step], Direction, Player, NewBoard), !.
 
 %Upon a trollPull, move the troll and the rock behind him
 move([Board, _ ,_], [Piece, [X,Y], Direction, trollPull], NewBoard):-
