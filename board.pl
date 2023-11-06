@@ -241,7 +241,7 @@ levitate_rock(Board, Direction, Player, NewBoard) :-
     direction_map(Direction, [Dx, Dy]),
     get_positions(Board, ['R'], Positions),
 
-    findall([X, Y], (member([X, Y], Positions), X2 is X + Dx, Y2 is Y + Dy, get_piece(Board, [X2, Y2], Piece), Piece = 0), LevitatingRocks),
+    findall([X, Y], (levitate_free_space(Board, [X, Y], [Dx, Dy], Positions)), LevitatingRocks),
     length(LevitatingRocks, Length),
     Length > 0, !,
     write('Do you want to levitate a rock? \n'),
@@ -264,7 +264,7 @@ levitate_rock(Board, Direction, Player, NewBoard) :-
     direction_map(Direction, [Dx, Dy]),
     get_positions(Board, ['R'], Positions),
 
-    findall([X, Y], (member([X, Y], Positions), X2 is X + Dx, Y2 is Y + Dy, get_piece(Board, [X2, Y2], Piece), Piece = 0), LevitatingRocks),
+    findall([X, Y], (levitate_free_space(Board, [X, Y], [Dx, Dy], Positions)), LevitatingRocks),
     length(LevitatingRocks, Length),
     Length > 0, !,
     custom_random(1,2, BotDecision),
@@ -282,6 +282,16 @@ levitate_rock(Board, Direction, Player, NewBoard) :-
 
 levitate_rock(Board, _, _, Board).
 
+
+%levitate_free_space(+Position, +Direction, +Positions)
+%checks if there is an empty space to levitate the rocks
+levitate_free_space(Board, [X, Y], [Dx, Dy], Positions) :-
+    member([X, Y], Positions),
+    X2 is X + Dx, Y2 is Y + Dy, 
+    get_piece(Board, [X2, Y2], Piece), 
+    Piece = 0.
+
+
 %value(+GameState, +Player, -Value)
 %Evaluates the board in terms of favorable positions for the player
 value([Board, _, _], Player, Value):-
@@ -298,7 +308,7 @@ value([Board, _, _], Player, Value):-
     Value is ClosestRockDistance+RockToSorcererDist.
 
 %get_troll_pos(+Board, +Player, -TrollPosition)
-%Gets the position of the player's troll
+%Gets the position of the player''s troll
 get_troll_pos(Board, Player, TrollPosition):-
     piece_map(Piece, 'Troll'),
     belongs(Player, Piece),
