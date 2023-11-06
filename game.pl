@@ -62,6 +62,12 @@ choose_move(Board, Player, 1, Move):- !,
     custom_random(1, Length, Option),
     nth1(Option, ListOfMoves, Move).
 
+choose_move(Board, Player, 2, Move):- !,
+    valid_moves([Board,_, _], Player, ListOfMoves),
+    length(ListOfMoves, Length),
+    Length > 0, !,
+    get_best_move(Board, ListOfMoves, Player, Move).
+
 %move(+GameState, +Move, -NewGameState)
 %When a dwarf/troll is going to an empty space, move the piece
 move([Board, _ ,_], [Piece, [X,Y], Direction, emptySpace], NewBoard):-
