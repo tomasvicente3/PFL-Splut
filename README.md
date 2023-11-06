@@ -1,8 +1,8 @@
 # Splut!
 
 Grupo 'Splut_6':
-- Adriano Alexandre dos Santos Machado (up202105352)
-- Tomás Alexandre Soeiro Vicente (up202108717)
+- Adriano Alexandre dos Santos Machado (up202105352) - 50%
+- Tomás Alexandre Soeiro Vicente (up202108717) - 50%
 
 ## Instalação and Execução
 
@@ -39,7 +39,6 @@ O *StoneTroll* é uma peça com duas habilidades distintas: arrastar e atirar um
 Se exitir uma pedra adjacente no sentido oposto ao movimento, o *StoneTroll* pode escolher movimentá-la consigo.
 
 <img src="doc/Troll_Pull.png" height="260">
-
 
 ####    Atirar
 
@@ -83,26 +82,36 @@ No início do jogo, as quatro pedras encontram-se dispostas nas extremidades do 
 
 
 ```prolog=
-[[-1,   -1,   -1,   'R',    -2,   -1,    -1],
+[[[-1,  -1,   -1,   'R',    -2,   -1,    -1],
  [-1,   -1,   't',  'd',   's',   -2,    -1],
  [-1,    0,    0,    0,      0,    0,    -2],
  ['R',   0,    0,    0,      0,    0,   'R'],
  [-1,    0,    0,    0,      0,    0,    -2],
  [-1,   -1,   'S',  'D',   'T',   -2,    -1],
- [-1,   -1,   -1,   'R',    -2,   -1,    -1], 1, 1]
+ [-1,   -1,   -1,   'R',    -2,   -1,    -1]], 1, 1]
 ```
+
+<br>
+<img src="doc/Initial_State.png" height=450>
+<br>
+<br>
 
 *   Estado Intermédio
 
 ```prolog=
-[[-1,   -1,   -1,  'R',  -2,   -1,   -1],
+[[[-1,  -1,   -1,  'R',  -2,   -1,   -1],
  [-1,   -1,    0,  't',   0,   -2,   -1],
  [-1,    0,    0,   0,   's',   0,   -2],
  ['R',   0,   'd', 'S',   0,    0,   'R'],
  [-1,    0,    0,  'T',   0,    0,   -2],
  [-1,   -1,    0,  'D',   0,   -2,   -1],
- [-1,   -1,   -1,  'R',  -2,   -1,   -1], 12, 3]
+ [-1,   -1,   -1,  'R',  -2,   -1,   -1]], 12, 3]
 ```
+
+<br>
+<img src="doc/Intermediate_State.png" height=450>
+<br>
+<br>
 
 *   Estado Final
 
@@ -110,11 +119,179 @@ No Splut! não é possível a ocorrência de empates pelo que o estado final só
 
 
 ```prolog=
-[[-1,   -1,   -1,  't',  -2,   -1,   -1],
+[[[-1,  -1,   -1,  't', -2,   -1,   -1],
  [-1,   -1,    0,   0,   0,   -2,   -1],
- [-1,    0,    0,   0,   's',   0,   -2],
- ['R',   0,   'd', 'R',   0,    0,   'R'],
- [-1,    0,    0,  'T',   0,    0,   -2],
- [-1,   -1,    0,  'D',   0,   -2,   -1],
- [-1,   -1,   -1,  'R',  -2,   -1,   -1], 13, 3]
+ [-1,    0,    0,   0,  's',   0,   -2],
+ ['R',   0,   'd', 'R',  0,    0,   'R'],
+ [-1,    0,   'T', 'D',  0,    0,   -2],
+ [-1,   -1,    0,   0,   0,   -2,   -1],
+ [-1,   -1,   -1,  'R', -2,   -1,   -1]], 13, 2]
 ```
+
+<br>
+<img src="doc/Final_State.png" height=450>
+<br>
+<br>
+
+### Visualização do estado de jogo
+
+####    Menus
+
+O nosso jogo tem três menus:
+
+* Menu Principal: Neste menu, o utilizador tem a possibilidade de iniciar o jogo, consultar as regras do mesmo ou sair da aplicação.
+
+* Seleção do Tamanho do Tabuleiro: Aqui, o utilizador pode optar por três tamanhos diferentes para o tabuleiro, nomeadamente, com sete, nove ou onze colunas.
+
+* Escolha do Modo de Jogo: Este menu permite ao utilizador selecionar o modo de jogo desejado, com opções que incluem Jogador vs Jogador, Jogador vs Inteligência Artificial, Inteligência Artificial vs Jogador e Inteligência Artificial vs Inteligência Artificial.
+
+Os três menus seguem uma estrutura comum, fundamentada nos seguintes predicados:
+
+print_options(+MenuType) - Responsável por exibir as opções disponíveis no menu.
+
+read_option(+Min, +Max, -Option) - Encarregado de receber um número dentro do intervalo especificado, compreendido entre Min e Max.
+
+option(+MenuType, +Option) - Este predicado lida com a opção selecionada pelo utilizador, de acordo com o tipo de menu em questão.
+
+```prolog=
+menu(main) :-
+    repeat,
+    clear_screen,
+    print_logo,
+    print_options(main_menu),
+    read_option(1, 3, Option),
+    option(main_menu, Option).
+
+option(main_menu, 1) :-
+    menu(board_size, Size),
+    menu(game_mode),
+    initial_state(Size, GameState),
+    display_game(GameState), !,
+    game_loop(GameState, 1).
+
+read_option(Min, Max, Option) :-
+    repeat,
+    write('\nOption: '),
+    read_number(Option),
+    (between(Min, Max, Option) ->  true ; write('Invalid option! Try again: '), fail).
+
+```
+
+####    Visualização do jogo
+
+Embora a interface de utilizador restrinja as opções de tamanho de tabuleiro a três escolhas com o intuito de proporcionar uma experiência de utilização mais intuitiva, é importante notar que o nosso código, em particular o predicado "display_game(+GameState)", é flexível e capaz de acomodar tabuleiros de diversas dimensões.
+
+O predicado "display_game(+GameState)" recebe o estado do jogo, determina as dimensões do tabuleiro e invoca um conjunto de predicados, nomeadamente o display_header, display_bar e display_board.
+
+```prolog=
+%display_game(+GameState)
+display_game([Board, _, _]) :-
+    clear_screen,
+    length(Board, Length),
+    display_header(Length),
+    display_bar(Length),
+    display_board(Board, 1, Length).
+    
+```
+
+Dada a diversidade de escolhas no nosso jogo, optamos por tornar a interação com o utilizador mais fácil, apresentando-lhe uma lista das jogadas disponíveis. O utilizador, como demonstrado na imagem abaixo, seleciona a sua jogada a partir dessa lista.
+
+
+<img src="doc/Interaction_Example.png" height=450>
+
+### Validação e execução de jogadas
+
+No nosso jogo, dividimos as jogadas possíveis em diferentes tipos "MoveTypes" :
+
+* "emptySpace" - Qualquer peça tem a capacidade de mover-se para um espaço vazio.
+* "trollPull" - O *StoneTroll* pode arrastar uma pedra atrás dele.
+* "trollThrow" - O *StoneTroll* pode arremessar uma pedra numa direção específica.
+* "dwarfPush" - O *Dwarf* pode empurrar todas as peças à sua frente.
+
+O predicado responsável por atualizar o estado do jogo com base na jogada realizada é denominado move(+GameState, +Move, -NewBoard). O argumento "Move" é uma lista que contém as seguintes informações: [Peça, [X, Y], Direção, TipoDeMovimento]. 
+
+A presença de diferentes tipos de movimento nos permitiu lidar de maneira mais simples com as diversas formas de movimentação, como exemplificado no exerto código a seguir.
+
+```prolog=
+move([Board, _ ,_], [Piece, [X,Y], Direction, emptySpace], NewBoard):-
+    piece_map(Piece, PieceType),
+    PieceType \= 'Sorcerer', !,
+    direction_map(Direction, [Dx, Dy]),
+    Nx is X + Dx, Ny is Y + Dy,
+    set_piece(Board, [X,Y], 0, TempBoard),
+    set_piece(TempBoard, [Nx, Ny], Piece, NewBoard), !.
+
+move([Board, _ ,_], [Piece, [X,Y], Direction, dwarfPush], NewBoard):-
+    shift_line(Board, [X,Y], Direction, NewBoard), !.
+```
+
+O utilizador só pode selecionar uma jogada a partir de um conjunto previamente calculado pelo nosso programa. Portanto, não é necessário realizar a validação antes da execução, uma vez que já foi feita anteriormente aquando do cálculo das jogadas possíveis, conforme será detalhado no próximo tópico.
+
+### Lista de movimentos válidos
+
+Para obter a lista de movimentos válidos, começamos por definir o predicado can_move(+Peça, +Tabuleiro, +Posição, +Direção, -TipoMovimento), no qual, se for possível mover uma determinada peça numa determinada direção, obtemos o tipo de movimento.
+
+Por exemplo, se um StoneTroll puder movimentar-se para um espaço vazio e existir uma pedra adjacente no sentido oposto ao movimento, este pode escolher movê-la consigo através de um trollPull.
+
+```prolog=
+can_move('Troll', Board, [X, Y], Direction, trollPull) :-
+    direction_map(Direction, [Dx, Dy]),
+    Nx is X + Dx,
+    Ny is Y + Dy,
+    get_piece(Board, [Nx, Ny], Ocupied),
+    Ocupied = 0,
+    opposing_direction(Direction, OpposingDirection),
+    direction_map(OpposingDirection, [ODx, ODy]),
+    Ox is X + ODx,
+    Oy is Y + ODy,
+    get_piece(Board, [Ox, Oy], Ocupied2),
+    Ocupied2 = 'R'.
+```
+
+O predicado valid_moves(+GameState, +Player, -ListOfMoves), começa por obter uma lista de todas as peças do jogador atual e, em seguida, chama o predicado get_moves(+Board, +PiecesList, +PiecesPosition, -ListOfMoves), que obtém a lista de todos os movimentos possíveis a partir de uma lista de peças.
+
+```prolog=
+valid_moves([Board,_, _], Player, ListOfMoves):-
+    findall(Piece, belongs(Player, Piece), PlayerPieces),
+    get_positions(Board, PlayerPieces, PiecesPosition),
+    get_moves(Board, PlayerPieces, PiecesPosition, ListOfMoves).
+
+get_moves(_, [], _, []).
+get_moves(Board, [Piece | RestPieces], [[X, Y] | RestPositions], ListOfMoves):-
+    Directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'],
+    findall([Piece, [X,Y], Direction, MoveType], 
+            (member(Direction, Directions), piece_map(Piece, PieceType), can_move(PieceType, Board, [X, Y], Direction, MoveType)), 
+            PieceMoves),
+    get_moves(Board, RestPieces, RestPositions, RestMoves),
+    append(PieceMoves, RestMoves, ListOfMoves).
+```
+
+### Fim de jogo
+
+No Splut!, o jogo chega ao fim quando resta apenas um dos Sorcerers. Logo, verificar se o jogo terminou é uma bastante simples, como se pode constatar na definição do predicado "game_over(+GameState)"
+
+```prolog=
+
+game_over([Board, _, _]):-
+    get_positions(Board, ['S'], Positions),
+    Positions = [], !,
+    congratulate(2).
+game_over([Board, _, _]):-
+    get_positions(Board, ['s'], Positions),
+    Positions = [], !,
+    congratulate(1).
+```
+
+### Avaliação do estado do jogo
+
+### Jogada do computador
+
+## Conclusões
+
+
+## Bibliografia
+
+As regras e a descrição do jogo foram obtidas através da consulta das seguintes fontes:
+
+1. iG Game Center. Splut Rules. https://www.iggamecenter.com/en/rules/splut
+2. BoardGameGeek. Splut. https://boardgamegeek.com/boardgame/64735/splut/images
