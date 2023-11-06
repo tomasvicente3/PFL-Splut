@@ -292,7 +292,6 @@ levitate_rock([Board, Turn, Steps], Direction, Player, NewBoard) :-
     get_all_rocks(Board, Positions),
 
     findall([X, Y], (levitate_free_space(Board, [X, Y], [Dx, Dy], Positions)), LevitatingRocks),
-    write(LevitatingRocks),
     length(LevitatingRocks, Length),
     Length > 0, !,
     custom_random(1,2, BotDecision),
@@ -306,7 +305,7 @@ levitate_rock([Board, Turn, Steps], Direction, Player, NewBoard) :-
         NX is RX + Dx, NY is RY + Dy,
         set_piece(TempBoard, [NX, NY], 'R', NewBoard)
     ;
-        format("Computer ~w chose not to levitate a rock \n", [Player]), get_char(_),
+        format("Computer ~w chose to not levitate a rock \n", [Player]), get_char(_),
         assertz(not_levitating(Turn, Steps)), 
         NewBoard = Board
     ).
@@ -350,7 +349,9 @@ levitate_free_space(Board, [X, Y], [Dx, Dy], Positions) :-
 %non_continuous_levitate(+Turn)
 %Checks if the player has already levitated and stopped levitating a rock in a given turn
 non_continuous_levitate(Turn):-
-    levitating(Turn, Step1), not_levitating(Turn, Step2), Step2 < Step1.
+    levitating(Turn, Step1), not_levitating(Turn, Step2), 
+    integer(Step1), integer(Step2), 
+    Step2 < Step1.
 
 %value(+GameState, +Player, -Value)
 %Evaluates the board in terms of favorable positions for the player
@@ -365,7 +366,7 @@ value([Board, _, _], Player, Value):-
     get_min(RockDistances, Value), !.
 
 %get_troll_pos(+Board, +Player, -TrollPosition)
-%Gets the position of the player''s troll
+%Gets the position of the player's troll
 get_troll_pos(Board, Player, TrollPosition):-
     piece_map(Piece, 'Troll'),
     belongs(Player, Piece),
@@ -382,7 +383,7 @@ get_enemy_sorcerer_pos(Board, Player, EnemySorcererPosition):-
     nth1(1, EnemySorcererPositionList, [_,EnemySorcererPosition]).
 
 %sorcerer_dead(+Board, +Player)
-%Checks if the player''s sorcerer is dead
+%Checks if the player's sorcerer is dead
 sorcerer_dead(Board, 1):-
     get_positions(Board, ['S'], SorcererPositions),!,
     SorcererPositions = [].
