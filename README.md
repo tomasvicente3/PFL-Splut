@@ -282,12 +282,38 @@ game_over([Board, _, _], Winner):-
     Winner = 1.
 ```
 
+
 ### Avaliação do estado do jogo
+
+O predicado value(+GameState, +Player, -Value) é responsável por avaliar o estado do jogo para um jogador específico, com base na disposição das peças. Esse valor desempenha um papel crucial no algoritmo "greedy" ao determinar a escolha do movimento mais vantajoso a ser executado.
+
+O valor que calculamos resulta da soma da menor distância entre o jogador e o troll até a rocha mais próxima, somada à distância entre essa rocha e o Sorcerer inimigo.
+
+```prolog=
+
+value([Board, _, _], Player, Value):-
+    get_positions(Board, ['R'], Positions),
+    
+    get_troll_pos(Board, Player, TrollPosition),
+
+    get_enemy_sorcerer_pos(Board,Player, EnemySorcererPosition),
+    
+    get_pos_distances(Positions, TrollPosition, RockPosDistances),
+    get_min_from_pos_dist(RockPosDistances, ClosestRockPos, ClosestRockDistance),
+    get_distances([ClosestRockPos], EnemySorcererPosition, SorcererDistances),
+    nth1(1, SorcererDistances, RockToSorcererDist),
+    Value is ClosestRockDistance+RockToSorcererDist.
+```
 
 ### Jogada do computador
 
+No nosso jogo, implementamos dois tipos de algoritmos: um algoritmo aleatório e um algoritmo "greedy" que seleciona, a cada turno, o movimento de maior valor.
+
 ## Conclusões
 
+Este projeto revelou-se desafiante, não obstante, conseguimos  implementar o nosso jogo com sucesso e cumprir os requisitos propostos. 
+
+A única funcionalidade que não foi integrada no nosso jogo foi a lógica que exigia que um *Sorcerer* só pudesse levitar uma pedra se esta tivesse sido movida no turno anterior. Embora essa funcionalidade pudesse ter sido implementada facilmente através da introdução de um predicado dinâmico, como o "moved(Turn, RockId)", não tivemos tempo de efetuar as alterações necessárias.
 
 ## Bibliografia
 
