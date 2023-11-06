@@ -22,7 +22,7 @@ step(GameState, Player, NewBoard):-
     format("\nPlayer ~w's turn (~w steps left)\n", [Player, Steps]), nl,
     choose_move(Board, Player, Move),
     move(GameState, Move, AccBoard),
-    display_game(AccBoard),
+    display_game([AccBoard, _, _]),
     NewSteps is Steps - 1,
     step([AccBoard, _, NewSteps], Player, NewBoard).
 

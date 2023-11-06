@@ -20,8 +20,7 @@ option(main_menu, 1) :-
     menu(board_size, Size),
     menu(game_mode),
     initial_state(Size, GameState),
-    [Board, _, _] = GameState,
-    display_game(Board), !,
+    display_game(GameState), !,
     game_loop(GameState, 1).
 
 %option(+MenuType, +Option)

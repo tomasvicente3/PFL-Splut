@@ -38,8 +38,8 @@ print_rules:-
     write('board. The game ends when only one player remains or when all players agree to end it.\n\n').
 
 %--------------GAME--------------
-%display_game(+Board)
-display_game(Board) :-
+%display_game(+GameState)
+display_game([Board, _, _]) :-
     clear_screen,
     length(Board, Length),
     display_header(Length),
