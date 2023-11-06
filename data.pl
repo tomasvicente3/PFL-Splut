@@ -30,6 +30,8 @@ piece_map('t', 'Troll').
 can_be_thrown_through(0).
 can_be_thrown_through('D').
 can_be_thrown_through('d').
+can_be_thrown_through('S').
+can_be_thrown_through('s').
 
 %stops_rock(+Piece)
 stops_rock(-1).
