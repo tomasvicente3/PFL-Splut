@@ -305,17 +305,13 @@ non_continuous_levitate(Turn):-
 %value(+GameState, +Player, -Value)
 %Evaluates the board in terms of favorable positions for the player
 value([Board, _, _], Player, Value):-
-    get_positions(Board, ['R'], Positions),
+    get_positions(Board, ['R'], RockPositions),
     
     get_troll_pos(Board, Player, TrollPosition),
-
     get_enemy_sorcerer_pos(Board,Player, EnemySorcererPosition),
     
-    get_pos_distances(Positions, TrollPosition, RockPosDistances),
-    get_min_from_pos_dist(RockPosDistances, ClosestRockPos, ClosestRockDistance),
-    get_distances([ClosestRockPos], EnemySorcererPosition, SorcererDistances),
-    nth1(1, SorcererDistances, RockToSorcererDist),
-    Value is ClosestRockDistance+RockToSorcererDist.
+    get_rock_distances(RockPositions, TrollPosition, EnemySorcererPosition, RockDistances),
+    get_min(RockDistances, Value), !.
 
 %get_troll_pos(+Board, +Player, -TrollPosition)
 %Gets the position of the player''s troll
