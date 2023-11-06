@@ -40,6 +40,7 @@ Se exitir uma pedra adjacente no sentido oposto ao movimento, o *StoneTroll* pod
 
 <img src="doc/_Troll_Pull.png" height="260">
 
+
 ####    Atirar
 
 O StoneTroll tem a capacidade de deslocar-se para uma casa já ocupada por uma pedra e lançar a pedra numa determinada direção.
@@ -268,52 +269,91 @@ get_moves(Board, [Piece | RestPieces], [[X, Y] | RestPositions], ListOfMoves):-
 
 ### Fim de jogo
 
-No Splut!, o jogo chega ao fim quando resta apenas um dos Sorcerers. Logo, verificar se o jogo terminou é uma bastante simples, como se pode constatar na definição do predicado "game_over(+GameState, -Winner)"
+No Splut!, o jogo chega ao fim quando resta apenas um dos Sorcerers. Logo, verificar se o jogo terminou é uma bastante simples, como se pode constatar na definição do predicado "game_over(+GameState)"
 
 ```prolog=
 
-game_over([Board, _, _], Winner):-
+game_over([Board, _, _]):-
     get_positions(Board, ['S'], Positions),
     Positions = [], !,
-    Winner = 2.
-game_over([Board, _, _], Winner):-
+    congratulate(2).
+game_over([Board, _, _]):-
     get_positions(Board, ['s'], Positions),
     Positions = [], !,
-    Winner = 1.
+    congratulate(1).
 ```
-
 
 ### Avaliação do estado do jogo
 
-O predicado value(+GameState, +Player, -Value) é responsável por avaliar o estado do jogo para um jogador específico, com base na disposição das peças. Esse valor desempenha um papel crucial no algoritmo "greedy" ao determinar a escolha do movimento mais vantajoso a ser executado.
+O predicado value(+GameState, +Player, -Value) é responsável por avaliar o estado do jogo para um jogador específico, com base na disposição das peças.
 
-O valor que calculamos resulta da soma da menor distância entre o jogador e o troll até a rocha mais próxima, somada à distância entre essa rocha e o Sorcerer inimigo.
+O valor que calculamos representa a menor distância possível entre o Troll do jogador e Sorcerer inimigo, passando por uma rocha.
 
 ```prolog=
-
 value([Board, _, _], Player, Value):-
-    get_positions(Board, ['R'], Positions),
+    get_positions(Board, ['R'], RockPositionsAux),
+    findall([X,Y], member([_,[X,Y]], RockPositionsAux), RockPositions),
     
     get_troll_pos(Board, Player, TrollPosition),
-
     get_enemy_sorcerer_pos(Board,Player, EnemySorcererPosition),
     
-    get_pos_distances(Positions, TrollPosition, RockPosDistances),
-    get_min_from_pos_dist(RockPosDistances, ClosestRockPos, ClosestRockDistance),
-    get_distances([ClosestRockPos], EnemySorcererPosition, SorcererDistances),
-    nth1(1, SorcererDistances, RockToSorcererDist),
-    Value is ClosestRockDistance+RockToSorcererDist.
+    get_rock_distances(RockPositions, TrollPosition, EnemySorcererPosition, RockDistances),
+    get_min(RockDistances, Value), !.
 ```
+
 
 ### Jogada do computador
 
-No nosso jogo, implementamos dois tipos de algoritmos: um algoritmo aleatório e um algoritmo "greedy" que seleciona, a cada turno, o movimento de maior valor.
+Em termos de jogadas feitas pelo computador implementamos dois algorítmos, um algóritmo aleatório e outro random.
+
+####    Algorítmo aleatório
+
+Selecionamos de forma aleatória um dos movimentos da lista de elementos válidos. Se for escolhido um movimento especial, como o "throwRock" ou "pullRock," a escolha da direção onde atirar a pedra ou entre arrastar ou não a rocha também é aleatória.
+
+```prolog=
+choose_move(Board, Player, 1, Move):- !,
+    valid_moves([Board,_, _], Player, ListOfMoves),
+    length(ListOfMoves, Length),
+    Length > 0, !,
+    custom_random(1, Length, Option),
+    nth1(Option, ListOfMoves, Move).
+    
+%custom_random(+Lower, +Higher, -Random)
+%Generates a random number between Lower and Higher and takes care of the edge case Lower = Higher
+custom_random(Lower, Higher, Random):-
+    Higher1 is Higher + 1,
+    random(Lower, Higher1, Random).
+```
+
+
+####    Algorítmo ganancioso
+
+Para o algorítmo ganancioso utilizamos o predicado value/3, explicitado no último ponto, e escolhemos de entre os movimentos possíveis aquele que tiver melhor valor (neste caso, o menor). Em caso de empate, o algoritmo escolhe a primeira jogada com que se depara com esse valor.
+
+
+```prolog=
+choose_move(Board, Player, Move):-
+    computer(Player, DificultyLevel), !,
+    choose_move(Board, Player, DificultyLevel, Move),
+    [Piece, _, Direction, _] = Move,
+    piece_map(Piece, PieceName),
+    format('Computer ~w chose the move: ~w(~w) - ~w \n', [Player, PieceName, Piece, Direction]),
+    get_char(_).
+    
+choose_move(Board, Player, 2, Move):- !,
+    valid_moves([Board,_, _], Player, ListOfMoves),
+    length(ListOfMoves, Length),
+    Length > 0, !,
+    get_best_move(Board, ListOfMoves, Player, Move).
+
+get_best_move(Board, ListOfMoves, Player, BestMove):-
+    findall([Move, Value], (member(Move, ListOfMoves), move([Board, _, _], Move, NewBoard), value([NewBoard, _, _], Player, Value)), ListOfValues),
+    get_best(ListOfValues, BestMove).
+```
 
 ## Conclusões
 
-Este projeto revelou-se desafiante, não obstante, conseguimos  implementar o nosso jogo com sucesso e cumprir os requisitos propostos. 
-
-A única funcionalidade que não foi integrada no nosso jogo foi a lógica que exigia que um *Sorcerer* só pudesse levitar uma pedra se esta tivesse sido movida no turno anterior. Embora essa funcionalidade pudesse ter sido implementada facilmente através da introdução de um predicado dinâmico, como o "moved(Turn, RockId)", não tivemos tempo de efetuar as alterações necessárias.
+Este projeto revelou-se desafiante, conseguimos no entanto implementar o nosso jogo com êxito e atender aos requisitos propostos. Estamos satisfeitos com a implementação de toda a lógica do nosso jogo, a representação do tabuleiro e a interação com o jogador. A área do nosso programa que poderia ser aprimorada está relacionada com o algoritmo ganancioso, para o qual, ao depararmos com um jogo desconhecido, com bastantes pormenores subtis que alteram que jogador está em vantagem, não conseguimos implementar uma métrica que representasse o estado do jogo com o tempo que alocamos para esta questão.
 
 ## Bibliografia
 
