@@ -268,18 +268,18 @@ get_moves(Board, [Piece | RestPieces], [[X, Y] | RestPositions], ListOfMoves):-
 
 ### Fim de jogo
 
-No Splut!, o jogo chega ao fim quando resta apenas um dos Sorcerers. Logo, verificar se o jogo terminou é uma bastante simples, como se pode constatar na definição do predicado "game_over(+GameState)"
+No Splut!, o jogo chega ao fim quando resta apenas um dos Sorcerers. Logo, verificar se o jogo terminou é uma bastante simples, como se pode constatar na definição do predicado "game_over(+GameState, -Winner)"
 
 ```prolog=
 
-game_over([Board, _, _]):-
+game_over([Board, _, _], Winner):-
     get_positions(Board, ['S'], Positions),
     Positions = [], !,
-    congratulate(2).
-game_over([Board, _, _]):-
+    Winner = 2.
+game_over([Board, _, _], Winner):-
     get_positions(Board, ['s'], Positions),
     Positions = [], !,
-    congratulate(1).
+    Winner = 1.
 ```
 
 ### Avaliação do estado do jogo
