@@ -2,7 +2,7 @@
 
 %Calls the step function, increments turn, resets steps and changes player
 game_loop([Board, Turn, Steps], Player) :-
-    step([Board, _, Steps], Player, NewBoard),
+    step([Board, Turn, Steps], Player, NewBoard),
     NewTurn is Turn + 1,
     min(NewTurn, 3, NewSteps),
     NewPlayer is 3 - Player,
@@ -110,12 +110,10 @@ move([Board, _ ,_], [_, [X,Y], Direction, dwarfPush], NewBoard):-
 %game_over(+GameState)
 %Checks if the game is over(There's a sorcerer missing)
 game_over([Board, _, _]):-
-    get_positions(Board, ['S'], Positions),
-    Positions = [], !,
+    sorcerer_dead(Board,1), !,
     congratulate(2).
 game_over([Board, _, _]):-
-    get_positions(Board, ['s'], Positions),
-    Positions = [], !,
+    sorcerer_dead(Board,2), !,
     congratulate(1).
 
 %congratulate(+Winner)

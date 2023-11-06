@@ -133,4 +133,6 @@ print_options(computer_difficulty, PlayerNum) :-
 %removes all the dynamic predicates
 clear_vars:-
     retractall(human(_)),
-    retractall(computer(_, _)).
+    retractall(computer(_, _)),
+    retractall(levitating(_,_)),
+    retractall(not_levitating(_,_)).
