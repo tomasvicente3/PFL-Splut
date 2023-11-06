@@ -45,7 +45,7 @@ choose_move(Board, Player, Move):-
     choose_move(Board, Player, DificultyLevel, Move),
     [Piece, _, Direction, _] = Move,
     piece_map(Piece, PieceName),
-    format('Computer ~w chose the move: ~w - ~w \n', [Player, PieceName, Direction]),
+    format('Computer ~w chose the move: ~w(~w) - ~w \n', [Player, PieceName, Piece, Direction]),
     get_char(_).
 
 %choose_move(+Board, +Player, +DificultyLevel, -Move)
