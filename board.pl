@@ -164,8 +164,6 @@ throw_rock(Board, Player, [X,Y], NewBoard):-
     findall([Direction, Value], (member(Direction, ListOfDirections), direction_map(Direction, [Dxl, Dyl]), Tx is X + Dxl, Ty is Y + Dyl, flying_rock(Board, [Tx,Ty], Direction, TempBoard) ,value([TempBoard, _, _], Player, Value)), ListOfValues),
     get_best(ListOfValues, ChosenDirection),
 
-    format("\nComputer ~w chose to throw the rock ~w \n",[Player, ChosenDirection]),
-    get_char(_),
     direction_map(ChosenDirection, [Dx, Dy]),
     Nx is X + Dx, Ny is Y + Dy,
     flying_rock(Board, [Nx,Ny], ChosenDirection, NewBoard).
@@ -286,7 +284,7 @@ levitate_rock([Board, Turn, Steps], Direction, Player, NewBoard) :-
     ).
 
 levitate_rock([Board, Turn, Steps], Direction, Player, NewBoard) :-
-    computer(Player, _),
+    computer(Player, 1),
     \+ non_continuous_levitate(Turn),
     direction_map(Direction, [Dx, Dy]),
     get_all_rocks(Board, Positions),
@@ -309,7 +307,7 @@ levitate_rock([Board, Turn, Steps], Direction, Player, NewBoard) :-
         assertz(not_levitating(Turn, Steps)), 
         NewBoard = Board
     ).
-/*
+
 levitate_rock([Board, Turn, Steps], Direction, Player, NewBoard) :-
     computer(Player, 2),
     \+ non_continuous_levitate(Turn),
@@ -324,17 +322,15 @@ levitate_rock([Board, Turn, Steps], Direction, Player, NewBoard) :-
         assertz(levitating(Turn, Steps)),
         choose_levitating_rock(Player, LevitatingRocks, ChosenRockIndex),
         nth1(ChosenRockIndex, LevitatingRocks, [RX, RY]),
-        format("Computer ~w chose to levitate the rock in (~w,~w) \n", [Player, RX, RY]),
         get_char(_),
         set_piece(Board, [RX, RY], 0, TempBoard),
         NX is RX + Dx, NY is RY + Dy,
         set_piece(TempBoard, [NX, NY], 'R', NewBoard)
     ;
-        format("Computer ~w chose not to levitate a rock \n", [Player]), get_char(_),
         assertz(not_levitating(Turn, Steps)), 
         NewBoard = Board
     ).
-*/
+
 levitate_rock([Board, _, _], _, _, Board).
 
 
