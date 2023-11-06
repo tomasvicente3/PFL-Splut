@@ -36,39 +36,18 @@ get_min_aux([H|T], Acc, Min):-
     min(H, Acc, NewAcc),
     get_min_aux(T, NewAcc, Min).
 
-
-%get_min_from_pos_dist(+PosDistances, -MinPos, -MinDist)
-%Get the position of the closest point to the target and its distance
-get_min_from_pos_dist([[Pos,Dist]| T], MinPos, MinDist):-
-    get_min_from_pos_dist_aux(T, Pos, Dist, MinPos, MinDist).
-
-get_min_from_pos_dist_aux([], MinPos, MinDist, MinPos, MinDist).
-get_min_from_pos_dist_aux([[Pos,Dist]| T], _, AccDist, MinPos, MinDist):-
-    min(Dist, AccDist, NewAccDist),
-    NewAccDist = Dist,
-    get_min_from_pos_dist_aux(T, Pos, NewAccDist, MinPos, MinDist).
-get_min_from_pos_dist_aux([[_,Dist]| T], AccPos, AccDist, MinPos, MinDist):-
-    min(Dist, AccDist, NewAccDist),
-    NewAccDist \= Dist,
-    get_min_from_pos_dist_aux(T, AccPos, NewAccDist, MinPos, MinDist).
-
-
-% Distance between two points in 2D space
+%distance(+Position1, +Position2, -Distance)
+%Distance between two points in 2D space
 distance([X1, Y1], [X2, Y2], D) :-
     DX is abs(X2 - X1),
     DY is abs(Y2 - Y1),
     D is DX+DY.
 
-%get_pos_distances(+Positions, +Target, -PosDistances)
-%Creates a list with Positions and their distance to the target
-get_pos_distances([], _, []).
-get_pos_distances([Pos|Rest], Target, [[Pos, Distance]|RestDistances]) :-
-    distance(Pos, Target, Distance),
-    get_pos_distances(Rest, Target, RestDistances).
-
-%get_distances(+Positions, +Target, -Distances)
-%Gets the distances from the positions to the target
-get_distances([], _, []).
-get_distances([[X,Y]|T], [TargetX, TargetY], [Distance|Distances]):-
-    Distance is abs(X - TargetX) + abs(Y - TargetY),
-    get_distances(T, [TargetX, TargetY], Distances).
+%get_rock_distances(+Positions, +TrollPosition, +EnemySorcererPosition, -Distances)
+%Gets the distances from the player's troll to the enemy's sorcerer, passing through the rocks
+get_rock_distances([], _, _, []).
+get_rock_distances([RockPos|T], TrollPos, EnemySorcererPos, [Distance|Distances]):-
+    distance(TrollPos, RockPos, TrollDistance),
+    distance(RockPos, EnemySorcererPos, SorcererDistance),
+    Distance is TrollDistance + SorcererDistance,
+    get_rock_distances(T, TrollPos, EnemySorcererPos, Distances).
